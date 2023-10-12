@@ -5,14 +5,15 @@ var csvData;
 // Define margin and dimensions for the charts
 const margin = {
   top: 20,
-  right: 20,
+  right: 40,
   bottom: 50,
-  left: 80,
+  left: 40,
 };
 
+const padding = 20
 
-const width = 500 - margin.left - margin.right;
-const height = 400 - margin.top - margin.bottom;
+const width = (window.screen.width - margin.left - margin.right) / 2;
+const height = (window.screen.height - margin.top - margin.bottom) / 2;
 
 // Function to start the dashboard
 function startDashboard() {
@@ -66,25 +67,27 @@ function startDashboard() {
 function createBarCharts(){
   // first make a count for each opponent team of wins and loses.
   opptable = winsandlosses(csvData)
+
+  // wins svg
   const svgW = d3
     .select("#barCharts")
     .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("width", (width - margin.left) / 2 - padding)
+    .attr("height", height)
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
-
   // Define scales
   const yScale = d3.scaleBand()
     .domain(opptable.map(d => d.name))
     .range([height - margin.top - margin.bottom, 0])
     .padding(0.3);
-
   const xScaleW = d3.scaleLinear()
     .domain([0, d3.max(opptable, d => d.wins)])
     .nice()
-    .range([0, width - margin.left - margin.right])
-
+    .range([0, width / 2 - margin.left - margin.right - 100])
+  const fillScale = d3.scaleLinear()
+    .domain([0,1])
+    .range([0, 1]);
   // Create and append the bars
   svgW.selectAll(".bar")
     .data(opptable)
@@ -93,17 +96,54 @@ function createBarCharts(){
     .attr("class", "bar")
     .attr("x", xScaleW(0))
     .attr("y", d => yScale(d.name))
+    .transition() // Apply a transition
+    .duration(1000)
     .attr("width",d => xScaleW(d.wins))
-    .attr("height", yScale.bandwidth());
-
+    .attr("height", yScale.bandwidth())
+    .attr("fill", d => d3.interpolateGreens(fillScale(d.winsRatio)));
   // Add x-axis
   svgW.append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
     .call(d3.axisBottom(xScaleW));
-
   // Add y-axis
   svgW.append("g")
+    .attr("class", "y-axis")
+    .call(d3.axisLeft(yScale));
+
+  // losses svg
+  const svgL = d3
+    .select("#barCharts")
+    .append("svg")
+    .attr("width", (width - margin.left) / 2 - padding)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+  // Define scales
+  const xScaleL = d3.scaleLinear()
+    .domain([0, d3.max(opptable, d => d.losses)])
+    .nice()
+    .range([0, width / 2 - margin.left - margin.right - 100])
+  // Create and append the bars
+  svgL.selectAll(".bar")
+    .data(opptable)
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", xScaleW(0))
+    .attr("y", d => yScale(d.name))
+    .transition() // Apply a transition
+    .duration(1000)
+    .attr("width",d => xScaleL(d.losses))
+    .attr("height", yScale.bandwidth())
+    .attr("fill", d => d3.interpolateReds(fillScale(d.winsRatio)));
+  // Add x-axis
+  svgL.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
+    .call(d3.axisBottom(xScaleL));
+  // Add y-axis
+  svgL.append("g")
     .attr("class", "y-axis")
     .call(d3.axisLeft(yScale));
 }
@@ -121,13 +161,11 @@ function winsandlosses(csvData){
     }
   });
 
-  for (const key in oppDict){
-    if(oppDict[key].wins == 0 && oppDict[key].losses == 0){
-      console.log(key)
-    }
-  }
-
-  console.log(oppDict["NOK"])
+  // add wins and losses ratio
+  csvData.forEach(element => {
+    oppDict[element.opp]["winsRatio"] = oppDict[element.opp].wins / (oppDict[element.opp].losses + oppDict[element.opp].wins)
+    oppDict[element.opp]["lossesRatio"] = oppDict[element.opp].losses / (oppDict[element.opp].losses + oppDict[element.opp].wins)
+  });
 
   // convert to a table
   const tableOpp = [];
@@ -136,10 +174,13 @@ function winsandlosses(csvData){
       const item = {
         "name": key,
         "wins": oppDict[key].wins,
-        "losses" : oppDict[key].losses
+        "losses" : oppDict[key].losses,
+        "winsRatio" : oppDict[key].winsRatio,
+        "lossesratio" : oppDict[key].lossesRatio
       };
       tableOpp.push(item);
     }
   }
+  console.log(oppDict["NYK"])
   return tableOpp;
 }
