@@ -28,7 +28,7 @@ function startDashboard() {
   importFiles('GamesData.csv').then(function (results) {
     csvData = results[0];
 
-    
+    /*
     // Convert incomeperperson and alcconsumption data to numbers
     csvData.forEach(function (d) {
       d.tm = +d.tm 
@@ -52,7 +52,7 @@ function startDashboard() {
       d.drb = +d.drb
       d.two_point_percentage = +d.two_point_percentage
     });
-    
+    */
 
 
     // Call functions to create the plots
@@ -121,6 +121,7 @@ function createParallelCoordinates() {
       .style("opacity", "0.2")
     // Second the hovered season takes its color
     d3.selectAll(".season-" + selected_season)
+      .raise()
       .transition().duration(200)
       .style("stroke", colorScale(selected_season))
       .style("opacity", "1")
@@ -176,23 +177,36 @@ function hideTooltip() {
       .on("mouseover", highlight)
       .on("mouseleave", doNotHighlight )
 
+    const dimensionMapping = {
+      "fg_percentage": "Field-goal %",
+      "free_throw_percentage": "Free-throw %",
+      "ast": "Assist",
+      "orb": "Offensive rebound",
+      "drb": "Defensive rebound",
+      "stl": "Steal",
+      "blk": "Block"
+    };
+    
+    function mapDimensionToTickValue(dimension) {
+      return dimensionMapping[dimension] || dimension;
+    }
 
    // Draw the axis:
-   svg.selectAll("myAxis")
+  svg.selectAll("myAxis")
    // For each dimension of the dataset I add a 'g' element:
-   .data(dimensions).enter()
-   .append("g")
-   .attr("class", "axis")
+    .data(dimensions).enter()
+    .append("g")
+    .attr("class", "axis")
    // I translate this element to its right position on the x axis
-   .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+    .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
    // And I build the axis with the call function
-   .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
+    .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
    // Add axis title
-   .append("text")
-     .style("text-anchor", "middle")
-     .attr("y", -9)
-     .text(function(d) { return d; })
-     .style("fill", "black");
+    .append("text")
+      .style("text-anchor", "middle")
+      .attr("y", -9)
+      .text((d) => mapDimensionToTickValue(d))
+      .style("fill", "black");
 }
 
 
