@@ -56,14 +56,14 @@ function startDashboard() {
 
 
     // Call functions to create the plots
-    createParallelCoordinates(); //Define width inside this function
+    createParallelCoordinates(csvData); //Define width inside this function
     createDensityPlot(); //Define width inside this function
   })
 
   }
 
   
-function createParallelCoordinates() {
+function createParallelCoordinates(csvData) {
 
   const width = 600; // - margin.left - margin.right;
   const svg = d3
@@ -107,39 +107,11 @@ function createParallelCoordinates() {
     .range([0, width])
     .domain(dimensions);
 
-  // Highlight the season that is hovered
-  const highlight = function(event, d){
-
-    selected_season = d.season
-
-    showTooltip(event, selected_season);
-
-    // first every group turns grey
-    d3.selectAll(".line")
-      .transition().duration(10)
-      .style("stroke", "lightgrey")
-      .style("opacity", "0.2")
-    // Second the hovered season takes its color
-    d3.selectAll(".season-" + selected_season)
-      .raise()
-      .transition().duration(200)
-      .style("stroke", colorScale(selected_season))
-      .style("opacity", "1")
-  }
-
-  // Unhighlight
-  const doNotHighlight = function(event, d){
-
-    hideTooltip();
-
-    d3.selectAll(".line")
-      .transition().duration(10)
-      .style("stroke", function(d){ return( colorScale(d.season))} )
-      .style("opacity", "1")
-  }
-
   // Function to show tooltip
-function showTooltip(event, season) {
+function showTooltip(event, d) {
+
+  season = d.season
+
   // Create or select the tooltip element
   let tooltip = d3.select("#tooltip");
 
@@ -160,53 +132,130 @@ function hideTooltip() {
   d3.select("#tooltip").transition().duration(10).style("opacity", 0);
 }
 
-  // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
-  function path(d) {
-    return d3.line()(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+
+
+// The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
+function path(d) {
+  return d3.line()(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+}
+
+// Draw the lines
+svg.selectAll("path")
+  .data(csvData)
+  .join("path")
+    .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
+    .attr("d",  (d) => path(d))
+    .style("fill", "none" )
+    .style("stroke", function(d){ return( colorScale(d.season))} )
+    .style("opacity", 0.5)
+    .on("mouseover", showTooltip)
+    .on("mouseleave", hideTooltip )
+
+  const dimensionMapping = {
+    "fg_percentage": "Field-goal %",
+    "free_throw_percentage": "Free-throw %",
+    "ast": "Assist",
+    "orb": "Offensive rebound",
+    "drb": "Defensive rebound",
+    "stl": "Steal",
+    "blk": "Block"
+  };
+  
+  function mapDimensionToTickValue(dimension) {
+    return dimensionMapping[dimension] || dimension;
   }
 
-  // Draw the lines
-  svg.selectAll("path")
-    .data(csvData)
-    .join("path")
-      .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
-      .attr("d",  (d) => path(d))
-      .style("fill", "none" )
-      .style("stroke", function(d){ return( colorScale(d.season))} )
-      .style("opacity", 0.5)
-      .on("mouseover", highlight)
-      .on("mouseleave", doNotHighlight )
+  // Draw the axis:
+svg.selectAll("myAxis")
+  // For each dimension of the dataset I add a 'g' element:
+  .data(dimensions).enter()
+  .append("g")
+  .attr("class", "axis")
+  // I translate this element to its right position on the x axis
+  .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+  // And I build the axis with the call function
+  .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
+  // Add axis title
+  .append("text")
+    .style("text-anchor", "middle")
+    .attr("y", -9)
+    .text((d) => mapDimensionToTickValue(d))
+    .style("fill", "black");
 
-    const dimensionMapping = {
-      "fg_percentage": "Field-goal %",
-      "free_throw_percentage": "Free-throw %",
-      "ast": "Assist",
-      "orb": "Offensive rebound",
-      "drb": "Defensive rebound",
-      "stl": "Steal",
-      "blk": "Block"
-    };
-    
-    function mapDimensionToTickValue(dimension) {
-      return dimensionMapping[dimension] || dimension;
+  // Create a group element to hold the lines
+const g = svg.append("g")
+.attr("class", "line");
+
+// Create a group element to hold the brushes
+const brushGroup = svg.append("g")
+.attr("class", "brushes");
+
+// Define the brushes for each dimension
+const brushes = {};
+
+// Create a brush for each dimension
+dimensions.forEach(function (dimension) {
+const scale = yScale[dimension];
+
+brushes[dimension] = d3.brushY()
+  .extent([[xScale(dimension) - 10, 0], [xScale(dimension) + 10, height]])
+  .on("start", brushStart)
+  .on("brush", brushed)
+  .on("end", brushEnd);
+
+// Append the brush to the brushGroup
+brushGroup.append("g")
+  .attr("class", "brush")
+  .call(brushes[dimension]);
+
+// Initialize the extent of each brush
+brushes[dimension].extent([0, 0]);
+});
+
+// Brush start event handler
+function brushStart() {
+d3.event.sourceEvent.stopPropagation(); // Prevent the brush event from propagating to the background
+}
+
+// Brush event handler
+function brushed(dimension) {
+const brushSelection = d3.event.selection;
+
+// Update the extent for the brushed dimension
+brushes[dimension].extent(brushSelection);
+
+// Filter the data based on the brush extent
+const filteredData = filterData(csvData);
+
+// Update the parallel coordinates plot with the filtered data
+updateParallelCoordinates(filteredData);
+}
+
+// Brush end event handler
+function brushEnd() {
+// You can perform any additional actions here when brushing ends, if needed
+}
+
+// Function to filter data based on the brush extents
+function filterData(data) {
+return data.filter(function (d) {
+  return dimensions.every(function (dimension) {
+    const brushExtent = brushes[dimension].extent();
+    if (!brushExtent[0] || !brushExtent[1]) {
+      // If no extent is selected, return true to include the data point
+      return true;
     }
+    const scale = yScale[dimension];
+    const value = +d[dimension];
+    return value >= scale.invert(brushExtent[1]) && value <= scale.invert(brushExtent[0]);
+  });
+});
+}
 
-   // Draw the axis:
-  svg.selectAll("myAxis")
-   // For each dimension of the dataset I add a 'g' element:
-    .data(dimensions).enter()
-    .append("g")
-    .attr("class", "axis")
-   // I translate this element to its right position on the x axis
-    .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
-   // And I build the axis with the call function
-    .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
-   // Add axis title
-    .append("text")
-      .style("text-anchor", "middle")
-      .attr("y", -9)
-      .text((d) => mapDimensionToTickValue(d))
-      .style("fill", "black");
+// Function to update the parallel coordinates plot with filtered data
+function updateParallelCoordinates(data) {
+
+}
 }
 
 
