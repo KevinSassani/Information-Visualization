@@ -1,1 +1,1 @@
-# Information-Visualization
+# Information Visualization Project
