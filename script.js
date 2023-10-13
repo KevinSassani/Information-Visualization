@@ -66,7 +66,9 @@ function startDashboard() {
 
 function createBarCharts(){
   // first make a count for each opponent team of wins and loses.
-  opptable = winsandlosses(csvData)
+  wlTable = winsandlosses(csvData)
+  wTable = wlTable[0]
+  lTable = wlTable[1]
 
   // wins svg
   const svgW = d3
@@ -75,14 +77,14 @@ function createBarCharts(){
     .attr("width", (width - margin.left) / 2 - padding)
     .attr("height", height)
     .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .attr("transform", `translate(${2*margin.left},${margin.top})`);
   // Define scales
-  const yScale = d3.scaleBand()
-    .domain(opptable.map(d => d.name))
+  const yScaleW = d3.scaleBand()
+    .domain(wTable.map(d => d.name))
     .range([height - margin.top - margin.bottom, 0])
     .padding(0.3);
   const xScaleW = d3.scaleLinear()
-    .domain([0, d3.max(opptable, d => d.wins)])
+    .domain([0, d3.max(wTable, d => d.wins)])
     .nice()
     .range([0, width / 2 - margin.left - margin.right - 100])
   const fillScale = d3.scaleLinear()
@@ -90,16 +92,16 @@ function createBarCharts(){
     .range([0, 1]);
   // Create and append the bars
   svgW.selectAll(".bar")
-    .data(opptable)
+    .data(wTable)
     .enter()
     .append("rect")
     .attr("class", "bar")
     .attr("x", xScaleW(0))
-    .attr("y", d => yScale(d.name))
+    .attr("y", d => yScaleW(d.name))
     .transition() // Apply a transition
     .duration(1000)
     .attr("width",d => xScaleW(d.wins))
-    .attr("height", yScale.bandwidth())
+    .attr("height", yScaleW.bandwidth())
     .attr("fill", d => d3.interpolateGreens(fillScale(d.winsRatio)));
   // Add x-axis
   svgW.append("g")
@@ -109,7 +111,20 @@ function createBarCharts(){
   // Add y-axis
   svgW.append("g")
     .attr("class", "y-axis")
-    .call(d3.axisLeft(yScale));
+    .call(d3.axisLeft(yScaleW));
+  // Add X-axis legend
+  svgW.append("text")
+    .attr("class", "x-axis-legend")
+    .attr("x", margin.left)
+    .attr("y", height - margin.bottom + 20)
+    .text("Games won");
+  // Add Y-axis legend
+  svgW.append("text")
+    .attr("class", "y-axis-legend")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -margin.left)
+    .text("Teams");
 
   // losses svg
   const svgL = d3
@@ -118,25 +133,29 @@ function createBarCharts(){
     .attr("width", (width - margin.left) / 2 - padding)
     .attr("height", height)
     .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .attr("transform", `translate(${margin.left*2},${margin.top})`);
   // Define scales
+  const yScaleL = d3.scaleBand()
+    .domain(lTable.map(d => d.name))
+    .range([height - margin.top - margin.bottom, 0])
+    .padding(0.3);
   const xScaleL = d3.scaleLinear()
-    .domain([0, d3.max(opptable, d => d.losses)])
+    .domain([0, d3.max(lTable, d => d.losses)])
     .nice()
     .range([0, width / 2 - margin.left - margin.right - 100])
   // Create and append the bars
   svgL.selectAll(".bar")
-    .data(opptable)
+    .data(lTable)
     .enter()
     .append("rect")
     .attr("class", "bar")
     .attr("x", xScaleW(0))
-    .attr("y", d => yScale(d.name))
+    .attr("y", d => yScaleL(d.name))
     .transition() // Apply a transition
     .duration(1000)
     .attr("width",d => xScaleL(d.losses))
-    .attr("height", yScale.bandwidth())
-    .attr("fill", d => d3.interpolateReds(fillScale(d.winsRatio)));
+    .attr("height", yScaleL.bandwidth())
+    .attr("fill", d => d3.interpolateReds(fillScale(d.lossesRatio)));
   // Add x-axis
   svgL.append("g")
     .attr("class", "x-axis")
@@ -145,7 +164,19 @@ function createBarCharts(){
   // Add y-axis
   svgL.append("g")
     .attr("class", "y-axis")
-    .call(d3.axisLeft(yScale));
+    .call(d3.axisLeft(yScaleL));
+  svgL.append("text")
+    .attr("class", "x-axis-legend")
+    .attr("x", margin.left)
+    .attr("y", height - margin.bottom + 20)
+    .text("Games lost");
+  // Add Y-axis legend
+  svgL.append("text")
+    .attr("class", "y-axis-legend")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -margin.left)
+    .text("Teams");
 }
 
 function winsandlosses(csvData){
@@ -176,11 +207,16 @@ function winsandlosses(csvData){
         "wins": oppDict[key].wins,
         "losses" : oppDict[key].losses,
         "winsRatio" : oppDict[key].winsRatio,
-        "lossesratio" : oppDict[key].lossesRatio
+        "lossesRatio" : oppDict[key].lossesRatio
       };
       tableOpp.push(item);
     }
   }
-  console.log(oppDict["NYK"])
-  return tableOpp;
+
+  //create one win and one losses sorted tables
+  wTable = [...tableOpp].sort((a, b) => a.wins - b.wins);
+  lTable = [...tableOpp].sort((a, b) => a.losses - b.losses);
+
+  return [wTable, lTable];
 }
+// TODO : transcript team code to Name, legends to add, team selection
