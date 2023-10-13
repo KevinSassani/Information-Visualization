@@ -1,7 +1,38 @@
 // Global data variable
 // Define a global variable to store the loaded CSV data
 var csvData;
-
+const codeToName = {"ATL" : "Atlanta Hawks",
+  "BOS" : "Boston Celtics",
+  "BKN" : "Brooklyn Nets",
+  "CHA" : "Charlotte Hornets",
+  "CHI" : "Chicago Bulls",
+  "CLE" : "Cleveland Cavaliers",
+  "DAL" : "Dallas Mavericks",
+  "DEN" : "Denver Nuggets",
+  "DET" : "Detroit Pistons",
+  "GSW" : "Golden State Warriors",
+  "HOU" : "Houston Rockets",
+  "IND" : "Indiana Pacers",
+  "LAC" : "Los Angeles Clippers",
+  "LAL" : "Los Angeles Lakers",
+  "MEM" : "Memphis Grizzlies",
+  "MIA" : "Miami Heat",
+  "MIL" : "Milwaukee Bucks",
+  "MIN" : "Minnesota Timberwolves",
+  "NOP" : "New Orleans Pelicans",
+  "NYK" : "New York Knicks",
+  "OKC" : "Oklahoma City Thunder",
+  "ORL" : "Orlando Magic",
+  "PHI" : "Philadelphia 76ers",
+  "PHX" : "Phoenix Suns",
+  "POR" : "Portland Trail Blazers",
+  "SAC" : "Sacramento Kings",
+  "SAS" : "San Antonio Spurs",
+  "TOR" : "Toronto Raptors",
+  "UTA" : "Utah Jazz",
+  "WAS" : "Washington Wizards"}
+const nameToCode = {} 
+for(k in codeToName) nameToCode[codeToName[k]] = k
 // Define margin and dimensions for the charts
 const margin = {
   top: 20,
@@ -95,6 +126,8 @@ function createBarCharts(){
     .data(wTable)
     .enter()
     .append("rect")
+    .on("mouseover", handleMouseOveBarChart)
+    .on("mouseout", handleMouseOutBarChart)
     .attr("class", "bar")
     .attr("x", xScaleW(0))
     .attr("y", d => yScaleW(d.name))
@@ -148,6 +181,8 @@ function createBarCharts(){
     .data(lTable)
     .enter()
     .append("rect")
+    .on("mouseover", handleMouseOveBarChart)
+    .on("mouseout", handleMouseOutBarChart)
     .attr("class", "bar")
     .attr("x", xScaleW(0))
     .attr("y", d => yScaleL(d.name))
@@ -219,4 +254,4 @@ function winsandlosses(csvData){
 
   return [wTable, lTable];
 }
-// TODO : transcript team code to Name, legends to add, team selection
+// TODO : team selection
