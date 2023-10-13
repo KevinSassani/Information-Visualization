@@ -66,6 +66,9 @@ function startDashboard() {
 function createParallelCoordinates(csvData) {
 
   const width = 600; // - margin.left - margin.right;
+  const deselectedColor = "rgb(221, 221, 221)";
+  const brushWidth = 50;
+
   const svg = d3
     .select("#parallelCoordinates")
     .append("svg")
@@ -108,48 +111,56 @@ function createParallelCoordinates(csvData) {
     .domain(dimensions);
 
   // Function to show tooltip
-function showTooltip(event, d) {
+  function showTooltip(event, d) {
 
-  season = d.season
+    season = d.season
 
-  // Create or select the tooltip element
-  let tooltip = d3.select("#tooltip");
+    // Create or select the tooltip element
+    let tooltip = d3.select("#tooltip");
 
-  // Show the tooltip
-  tooltip.transition().duration(10).style("opacity", 0.9);
+    // Show the tooltip
+    tooltip.transition().duration(10).style("opacity", 0.9);
 
-  // Position the tooltip at the cursor
-  tooltip.style("left", (event.pageX + 10) + "px")
-    .style("top", (event.pageY - 20) + "px");
+    // Position the tooltip at the cursor
+    tooltip.style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 20) + "px");
 
-  // Set the tooltip text
-  tooltip.text(season);
-}
+    // Set the tooltip text
+    tooltip.text(season);
+  }
 
-// Function to hide the tooltip
-function hideTooltip() {
-  // Hide the tooltip
-  d3.select("#tooltip").transition().duration(800).style("opacity", 0);
-}
+  // Function to hide the tooltip
+  function hideTooltip() {
+    // Hide the tooltip
+    d3.select("#tooltip").transition().duration(800).style("opacity", 0);
+  }
 
 
 
-// The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
-function path(d) {
-  return d3.line()(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
-}
+  // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
+  function path(d) {
+    return d3.line()(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+  }
 
-// Draw the lines
-svg.selectAll("path")
-  .data(csvData)
-  .join("path")
-    .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
-    .attr("d",  (d) => path(d))
-    .style("fill", "none" )
-    .style("stroke", function(d){ return( colorScale(d.season))} )
-    .style("opacity", 0.5)
-    .on("mouseover", showTooltip)
-    .on("mouseleave", hideTooltip )
+  // Draw the lines
+  svg.selectAll("path")
+    .data(csvData)
+    .join("path")
+      .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
+      .attr("d",  (d) => path(d))
+      .style("fill", "none" )
+      .style("stroke", function(d){ return( colorScale(d.season))} )
+      .style("opacity", 0.5)
+      .on("mouseover", function(event,d) {
+        // Check if the line is active (matches all selections)
+        const isActive = d3.select(this).style("stroke") !== deselectedColor;
+        
+        // Show the tooltip only if the line is active
+        if (isActive) {
+          showTooltip(event, d);
+        }
+      })
+      .on("mouseleave", hideTooltip )
 
   const dimensionMapping = {
     "fg_percentage": "Field-goal %",
@@ -183,61 +194,55 @@ svg.selectAll("path")
       .style("fill", "black");
 
 
-   // Create the brush behavior along the y-axis.
-   const deselectedColor = "#ddd";
-   const brushWidth = 50;
-   const brush = d3.brushY()
-     .extent([
-       [-(brushWidth / 2), 0],
-       [brushWidth / 2, height]
-     ])
-     .on("start brush end", brushed);
+  // Create the brush behavior along the y-axis.
+
+  const brush = d3.brushY()
+    .extent([
+      [-(brushWidth / 2), 0],
+      [brushWidth / 2, height]
+    ])
+    .on("start brush end", brushed);
  
    // Attach the brush to the axes
-   const axes = svg.selectAll(".axis");
-   axes.call(brush);
+  const axes = svg.selectAll(".axis");
+  axes.call(brush);
  
-   const selections = new Map();
-   let filteredData = [];
+  const selections = new Map();
  
-   function brushed({ selection }, key) {
-    console.log(key)
-     if (selection === null) selections.delete(key);
-     else selections.set(key, selection.map(yScale[key].invert));
+  function brushed({ selection }, key) {
+    if (selection === null) selections.delete(key);
+    else selections.set(key, selection.map(yScale[key].invert));
  
-     const selected = [];
+    const selected = [];
  
-     // Iterate through the paths and update their appearance based on the selection
-     svg.selectAll(".line")
-     .each(function(d) {
-       // Initialize an 'active' flag to false
-       let active = false;
-       
-       // Check for each selection whether the data point falls within the range
-       Array.from(selections).forEach(([key, [max, min]]) => {
-         const value = +d[key];
-         min = +min
-         max = +max
-         
-         if (value >= min && value <= max) {
-            console.log(`Key: ${key}, Value: ${value}, Min: ${min}, Max: ${max}}`);
-            active = true; // Set 'active' to true if any selection matches
-         }
+    // Iterate through the paths and update their appearance based on the selection
+    svg.selectAll(".line")
+    .each(function(d) {
+      // Initialize an 'active' flag to true
+      let active = true;
+      
+      // Check for each selection whether the data point falls within the range
+      Array.from(selections).forEach(([key, [max, min]]) => {
+        const value = +d[key];
+        min = +min
+        max = +max
         
-        });
-   
-       console.log(`Active: ${active}`);
-   
-       // Update the line's appearance based on the 'active' flag
-       d3.select(this)
-         .style("stroke", active ? colorScale(d.season) : deselectedColor);
-   
-       if (active) {
-         d3.select(this).raise();
-         selected.push(d);
-       }
-       d3.selectAll(".brush").raise();
-     });
+        if (!(value >= min && value <= max)) {
+          active = false; // Set 'active' to false if any selection matches
+        } 
+      
+      });
+  
+      // Update the line's appearance based on the 'active' flag
+      d3.select(this)
+        .style("stroke", active ? colorScale(d.season) : deselectedColor);
+  
+      if (active) {
+        d3.select(this).raise();
+        selected.push(d);
+      }
+      d3.selectAll(".brush").raise();
+    });
      
  
      // Dispatch an event with the selected data
