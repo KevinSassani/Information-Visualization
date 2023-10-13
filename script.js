@@ -1,11 +1,12 @@
 // Global data variable
 // Define a global variable to store the loaded CSV data
-var csvData;
+var originalData;
+var currentData;
 const codeToName = {"ATL" : "Atlanta Hawks",
-  "BOS" : "Boston Celtics",
-  "BKN" : "Brooklyn Nets",
+  "BRK" : "Brooklyn Nets",
   "CHA" : "Charlotte Hornets",
   "CHI" : "Chicago Bulls",
+  "CHO" : "Charlotte's Hornets",
   "CLE" : "Cleveland Cavaliers",
   "DAL" : "Dallas Mavericks",
   "DEN" : "Denver Nuggets",
@@ -19,20 +20,28 @@ const codeToName = {"ATL" : "Atlanta Hawks",
   "MIA" : "Miami Heat",
   "MIL" : "Milwaukee Bucks",
   "MIN" : "Minnesota Timberwolves",
+  "NJN" : "New Jersey Nets",
+  "NOH" : "New Orleans Hornets",
+  "NOK" : "New Orleans/Oklahoma City Hornets",
   "NOP" : "New Orleans Pelicans",
   "NYK" : "New York Knicks",
   "OKC" : "Oklahoma City Thunder",
   "ORL" : "Orlando Magic",
   "PHI" : "Philadelphia 76ers",
-  "PHX" : "Phoenix Suns",
+  "PHO" : "Phoenix Suns",
   "POR" : "Portland Trail Blazers",
   "SAC" : "Sacramento Kings",
   "SAS" : "San Antonio Spurs",
+  "SEA" : "Seattle Supersonics",
   "TOR" : "Toronto Raptors",
   "UTA" : "Utah Jazz",
   "WAS" : "Washington Wizards"}
 const nameToCode = {} 
 for(k in codeToName) nameToCode[codeToName[k]] = k
+
+// Define variable to know if the team is selected or not
+const selectedTeams = new Set(Object.keys(codeToName));
+
 // Define margin and dimensions for the charts
 const margin = {
   top: 20,
@@ -41,6 +50,36 @@ const margin = {
   left: 40,
 };
 
+// show team checkbox
+var expanded = false;
+function showCheckboxes() {
+  var checkboxes = document.getElementById("checkboxes");
+  Object.keys(nameToCode).forEach(key => {
+    // Create a checkbox input element
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = key.toLowerCase(); // Set a unique ID for each checkbox
+    checkbox.checked = true;
+    checkbox.onchange = () => teamChange(nameToCode[key]);
+  
+    // Create a label element for the checkbox
+    const label = document.createElement('label');
+    label.htmlFor = key.toLowerCase();
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(key));
+
+    // Append the checkbox and label to the container
+    checkboxes.appendChild(label);
+  });
+  // display or hide checkbox
+  if (!expanded) {
+    checkboxes.style.display = "block";
+    expanded = true;
+  } else {
+    checkboxes.style.display = "none";
+    expanded = false;
+  }
+}
 const padding = 20
 
 const width = (window.screen.width - margin.left - margin.right) / 2;
@@ -58,11 +97,11 @@ function startDashboard() {
   }
   
   importFiles('GamesData.csv').then(function (results) {
-    csvData = results[0];
-
+    originalData = results[0];
+    currentData = originalData;
     
     // Convert incomeperperson and alcconsumption data to numbers
-    csvData.forEach(function (d) {
+    originalData.forEach(function (d) {
       d.tm = +d.tm 
       d.opp_score = +d.opp_score
       d.fg = +d.fg
@@ -97,7 +136,7 @@ function startDashboard() {
 
 function createBarCharts(){
   // first make a count for each opponent team of wins and loses.
-  wlTable = winsandlosses(csvData)
+  wlTable = winsandlosses(currentData)
   wTable = wlTable[0]
   lTable = wlTable[1]
 
@@ -108,6 +147,7 @@ function createBarCharts(){
     .attr("width", (width - margin.left) / 2 - padding)
     .attr("height", height)
     .append("g")
+    .attr("id", "winsBarChart")
     .attr("transform", `translate(${2*margin.left},${margin.top})`);
   // Define scales
   const yScaleW = d3.scaleBand()
@@ -166,6 +206,7 @@ function createBarCharts(){
     .attr("width", (width - margin.left) / 2 - padding)
     .attr("height", height)
     .append("g")
+    .attr("id", "lossesBarChart")
     .attr("transform", `translate(${margin.left*2},${margin.top})`);
   // Define scales
   const yScaleL = d3.scaleBand()
@@ -214,9 +255,9 @@ function createBarCharts(){
     .text("Teams");
 }
 
-function winsandlosses(csvData){
+function winsandlosses(currentData){
   oppDict = {}
-  csvData.forEach(element => {
+  currentData.forEach(element => {
     if(!(element.opp in oppDict)){
       oppDict[element.opp] = {"wins" : 0, "losses" : 0}
     }
@@ -228,7 +269,7 @@ function winsandlosses(csvData){
   });
 
   // add wins and losses ratio
-  csvData.forEach(element => {
+  currentData.forEach(element => {
     oppDict[element.opp]["winsRatio"] = oppDict[element.opp].wins / (oppDict[element.opp].losses + oppDict[element.opp].wins)
     oppDict[element.opp]["lossesRatio"] = oppDict[element.opp].losses / (oppDict[element.opp].losses + oppDict[element.opp].wins)
   });
@@ -253,5 +294,15 @@ function winsandlosses(csvData){
   lTable = [...tableOpp].sort((a, b) => a.losses - b.losses);
 
   return [wTable, lTable];
+}
+
+function teamChange(team){
+  if(selectedTeams.has(team)){
+    selectedTeams.delete(team)
+  }else{
+    selectedTeams.add(team)
+  }
+  currentData = originalData.filter((d) => {return selectedTeams.has(d.opp)})
+  updateBarChart(currentData)
 }
 // TODO : team selection

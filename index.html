@@ -34,15 +34,66 @@
             #barCharts{
                 text-align: justify;
             }
+            .multiselect {
+            width: 200px;
+            }
+
+            .selectBox {
+            position: relative;
+            }
+
+            .selectBox select {
+            width: 100%;
+            }
+
+            .overSelect {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            }
+
+            #checkboxes {
+            display: none;
+            border: 1px #dadada solid;
+            overflow: scroll;
+            height: 6vh;
+            text-align: left;
+            }
+
+            #checkboxes label {
+            display: block;
+            font-size: small;
+            color: white;
+            }
+
+            #checkboxes label:hover {
+            background-color: #1e90ff;
+            }
         </style>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
         <script src="script.js"></script>
+        <script src="update.js"></script>
         <script src="linked.js"></script>
     </head>
     <header> 
         <div id="seasonSlider"></div>
-        <div id="teamMenu"></div> <!--Might not be needed as we can click in the bar chart-->
+        <div id="teamMenu">
+            <form>
+                <div class="multiselect">
+                  <div class="selectBox" onclick="showCheckboxes()">
+                    <select>
+                      <option>Select teams</option>
+                    </select>
+                    <div class="overSelect"></div>
+                  </div>
+                  <div id="checkboxes">
+                  </div>
+                </div>
+              </form>
+        </div> <!--Might not be needed as we can click in the bar chart-->
     </header>
     <body onload="startDashboard()">
         <div class="dashboard">
