@@ -129,7 +129,7 @@ function showTooltip(event, d) {
 // Function to hide the tooltip
 function hideTooltip() {
   // Hide the tooltip
-  d3.select("#tooltip").transition().duration(10).style("opacity", 0);
+  d3.select("#tooltip").transition().duration(800).style("opacity", 0);
 }
 
 
@@ -166,97 +166,85 @@ svg.selectAll("path")
   }
 
   // Draw the axis:
-svg.selectAll("myAxis")
-  // For each dimension of the dataset I add a 'g' element:
-  .data(dimensions).enter()
-  .append("g")
-  .attr("class", "axis")
-  // I translate this element to its right position on the x axis
-  .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
-  // And I build the axis with the call function
-  .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
-  // Add axis title
-  .append("text")
-    .style("text-anchor", "middle")
-    .attr("y", -9)
-    .text((d) => mapDimensionToTickValue(d))
-    .style("fill", "black");
+  svg.selectAll("myAxis")
+    // For each dimension of the dataset I add a 'g' element:
+    .data(dimensions).enter()
+    .append("g")
+    .attr("class", "axis")
+    // I translate this element to its right position on the x axis
+    .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+    // And I build the axis with the call function
+    .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
+    // Add axis title
+    .append("text")
+      .style("text-anchor", "middle")
+      .attr("y", -9)
+      .text((d) => mapDimensionToTickValue(d))
+      .style("fill", "black");
 
-  // Create a group element to hold the lines
-const g = svg.append("g")
-.attr("class", "line");
 
-// Create a group element to hold the brushes
-const brushGroup = svg.append("g")
-.attr("class", "brushes");
-
-// Define the brushes for each dimension
-const brushes = {};
-
-// Create a brush for each dimension
-dimensions.forEach(function (dimension) {
-const scale = yScale[dimension];
-
-brushes[dimension] = d3.brushY()
-  .extent([[xScale(dimension) - 10, 0], [xScale(dimension) + 10, height]])
-  .on("start", brushStart)
-  .on("brush", brushed)
-  .on("end", brushEnd);
-
-// Append the brush to the brushGroup
-brushGroup.append("g")
-  .attr("class", "brush")
-  .call(brushes[dimension]);
-
-// Initialize the extent of each brush
-brushes[dimension].extent([0, 0]);
-});
-
-// Brush start event handler
-function brushStart() {
-d3.event.sourceEvent.stopPropagation(); // Prevent the brush event from propagating to the background
+   // Create the brush behavior along the y-axis.
+   const deselectedColor = "#ddd";
+   const brushWidth = 50;
+   const brush = d3.brushY()
+     .extent([
+       [-(brushWidth / 2), 0],
+       [brushWidth / 2, height]
+     ])
+     .on("start brush end", brushed);
+ 
+   // Attach the brush to the axes
+   const axes = svg.selectAll(".axis");
+   axes.call(brush);
+ 
+   const selections = new Map();
+   let filteredData = [];
+ 
+   function brushed({ selection }, key) {
+    console.log(key)
+     if (selection === null) selections.delete(key);
+     else selections.set(key, selection.map(yScale[key].invert));
+ 
+     const selected = [];
+ 
+     // Iterate through the paths and update their appearance based on the selection
+     svg.selectAll(".line")
+     .each(function(d) {
+       // Initialize an 'active' flag to false
+       let active = false;
+       
+       // Check for each selection whether the data point falls within the range
+       Array.from(selections).forEach(([key, [max, min]]) => {
+         const value = +d[key];
+         min = +min
+         max = +max
+         
+         if (value >= min && value <= max) {
+            console.log(`Key: ${key}, Value: ${value}, Min: ${min}, Max: ${max}}`);
+            active = true; // Set 'active' to true if any selection matches
+         }
+        
+        });
+   
+       console.log(`Active: ${active}`);
+   
+       // Update the line's appearance based on the 'active' flag
+       d3.select(this)
+         .style("stroke", active ? colorScale(d.season) : deselectedColor);
+   
+       if (active) {
+         d3.select(this).raise();
+         selected.push(d);
+       }
+       d3.selectAll(".brush").raise();
+     });
+     
+ 
+     // Dispatch an event with the selected data
+     svg.property("value", selected).dispatch("input");
+   }
 }
 
-// Brush event handler
-function brushed(dimension) {
-const brushSelection = d3.event.selection;
-
-// Update the extent for the brushed dimension
-brushes[dimension].extent(brushSelection);
-
-// Filter the data based on the brush extent
-const filteredData = filterData(csvData);
-
-// Update the parallel coordinates plot with the filtered data
-updateParallelCoordinates(filteredData);
-}
-
-// Brush end event handler
-function brushEnd() {
-// You can perform any additional actions here when brushing ends, if needed
-}
-
-// Function to filter data based on the brush extents
-function filterData(data) {
-return data.filter(function (d) {
-  return dimensions.every(function (dimension) {
-    const brushExtent = brushes[dimension].extent();
-    if (!brushExtent[0] || !brushExtent[1]) {
-      // If no extent is selected, return true to include the data point
-      return true;
-    }
-    const scale = yScale[dimension];
-    const value = +d[dimension];
-    return value >= scale.invert(brushExtent[1]) && value <= scale.invert(brushExtent[0]);
-  });
-});
-}
-
-// Function to update the parallel coordinates plot with filtered data
-function updateParallelCoordinates(data) {
-
-}
-}
 
 
 
