@@ -24,7 +24,7 @@ function handleMouseOutBarChart(event, item){
 // Brushing functionality of the parallel coordinates plot
 const selections = new Map();
  
-function brushed({ selection }, key, alreadyFilteredData) {
+function brushed({ selection }, key) {
   const deselectedColor = "rgb(221, 221, 221)";
   const brushWidth = 50;
 
@@ -75,8 +75,6 @@ function brushed({ selection }, key, alreadyFilteredData) {
     yScale[dimension] = scale;
   });
 
-
-
   if (selection === null) selections.delete(key);
   else selections.set(key, selection.map(yScale[key].invert));
 
@@ -87,9 +85,6 @@ function brushed({ selection }, key, alreadyFilteredData) {
   .each(function(d) {
     // Initialize an 'active' flag to true if the data point is included in the filtered data
     let active = true;
-    if (!d.included(alreadyFilteredData)) {
-      active = false
-    }
     
     
     // Check for each selection whether the data point falls within the range
@@ -115,7 +110,11 @@ function brushed({ selection }, key, alreadyFilteredData) {
     d3.selectAll(".brush").raise();
   });
     
+    currentData = originalData.filter((d) => {return selected.includes(d)});   
 
     // Dispatch an event with the selected data
     d3.select("#parallelCoordinates").property("value", selected).dispatch("input");
+
+    // Update other plots
+    updateBarChart(currentData);
   }
