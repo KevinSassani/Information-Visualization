@@ -35,8 +35,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     const bars = svgW.selectAll(".bar").data(wTable);
 
 
-    // Remove any bars that are no longer in the updated data
-    bars.exit().transition().duration(500).attr("width", 0).remove();
+    
 
     // Update existing bars with transitions for position, width, height, and color
     bars
@@ -46,6 +45,11 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("width",d => xScaleW(d.wins))
     .attr("height", yScaleW.bandwidth())
     .attr("fill", d => d3.interpolateGreens(fillScale(d.winsRatio)));
+
+    // Remove any bars that are no longer in the updated data 
+    // THIS DOES NOT WORK PROPERLY
+    bars.exit().transition().duration(500).attr("width", 0).remove();
+
     // Add new bars for any new data points and transition them to their correct position and width
     bars
     .enter()
