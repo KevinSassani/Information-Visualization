@@ -2,7 +2,7 @@
 // Brushing functionality of the parallel coordinates plot
 const selections = new Map();
  
-function brushed({ selection }, key) {
+function brushed({ selection }, key, alreadyFilteredData) {
   const deselectedColor = "rgb(221, 221, 221)";
   const brushWidth = 50;
 
@@ -63,8 +63,12 @@ function brushed({ selection }, key) {
   // Iterate through the paths and update their appearance based on the selection
   d3.selectAll(".line")
   .each(function(d) {
-    // Initialize an 'active' flag to true
+    // Initialize an 'active' flag to true if the data point is included in the filtered data
     let active = true;
+    if (!d.included(alreadyFilteredData)) {
+      active = false
+    }
+    
     
     // Check for each selection whether the data point falls within the range
     Array.from(selections).forEach(([key, [max, min]]) => {
