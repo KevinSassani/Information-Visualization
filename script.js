@@ -89,6 +89,8 @@ function startDashboard() {
       .attr("id", "slider")
       .attr("width", 320)
       .attr("height", 50);;
+    
+    
   
     const sliderRange = d3
       .sliderBottom()
@@ -98,15 +100,13 @@ function startDashboard() {
       .default([d3.min(csvData, d => Math.min(d.tm, d.opp_score)), d3.max(csvData, d => Math.max(d.tm, d.opp_score))])
       .fill('#85bb65')
       .ticks(0);
+    
   
     sliderRange.on('onchange', val => {
-      x.domain(val);
-      redrawDensityPlot('tm'); // Update the 'tm' density plot
-      //redrawDensityPlot('opp_score'); // Update the 'opp_score' density plot
-      svg.select(".x-axis")
-        .transition()
-        .duration(300)
-        .call(d3.axisBottom(x));
+      //x.domain(val);
+      minSliderValue = val[0];
+      maxSliderValue = val[1];
+      redrawDensityPlot('tm', minSliderValue, maxSliderValue);
     });
   
     sliderSvg.call(sliderRange);
@@ -131,14 +131,10 @@ function startDashboard() {
       .default([d3.min(csvData, d => Math.min(d.tm, d.opp_score)), d3.max(csvData, d => Math.max(d.tm, d.opp_score))])
       .fill('#404080');
   
-    sliderRange2.on('onchange', val => {
-      x.domain(val);
-      //redrawDensityPlot('tm'); // Update the 'tm' density plot
-      redrawDensityPlot('opp_score'); // Update the 'opp_score' density plot
-      svg.select(".x-axis")
-        .transition()
-        .duration(300)
-        .call(d3.axisBottom(x));
+    sliderRange2.on('onchange', val2 => {
+      minSliderValue2 = val2[0];
+      maxSliderValue2 = val2[1];
+      redrawDensityPlot('opp_score', minSliderValue2, maxSliderValue2);
     });
   
     sliderSvg2.call(sliderRange2);
@@ -181,53 +177,31 @@ function startDashboard() {
       };
     }
   
-    function redrawDensityPlot(dataField) {
-      var minslidervalue = 0;
-      var maxslidervalue = 0;
-      const currentSliderRange = sliderRange.value();
-      const currentSliderRange2 = sliderRange2.value();
+    function redrawDensityPlot(dataField, min, max) {
 
-      // Get the minimum and maximum values from the current slider range
-      const minSliderValue = currentSliderRange[0];
-      const maxSliderValue = currentSliderRange[1];
+      const fieldToFilter = dataField === 'tm' ? 'tm' : 'opp_score';
 
-      const minSliderValue2 = currentSliderRange2[0];
-      const maxSliderValue2 = currentSliderRange2[1];
+      // Filter the data based on the selected field
+      const filteredData = csvData.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
 
-      if (minSliderValue<minSliderValue2){
-        minslidervalue = minSliderValue;
-      }
-      else{
-        minslidervalue = minSliderValue2;
-      }
-
-      if(maxSliderValue > maxSliderValue2){
-        maxslidervalue = maxSliderValue;
-      }
-
-      else{
-        maxslidervalue = maxSliderValue2;
-      }
-        
-
-
-
-      const filteredTMData = csvData.filter(d => d.tm >= minSliderValue && d.tm <= maxSliderValue);
+      console.log(filteredData)
 
       // Calculate the max and min values for the filtered "tm" data
-      const maxDomainValue = d3.max(filteredTMData, d => d[dataField]);
-      const minDomainValue = d3.min(filteredTMData, d => d[dataField]);
-
-      // Update the x-axis domain with the fixed range from 6 to 150
+      var xFiltered = d3.scaleLinear()
+        .domain([56, 150]) // Fixed x-axis domain
+        .nice()
+        .range([0, width]);
       
 
-      console.log(minSliderValue)
+      console.log(min)
+      console.log(max)
       // Update the x-axis domain
       
-      var kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(60));
-      var density = kde(csvData.map(function (d) {
-        return d[dataField]; // 'tm' or 'opp_score'
-      }));
+      
+      var kde = kernelDensityEstimator(kernelEpanechnikov(7), xFiltered.ticks(60));
+      var density = kde(filteredData.map(function (d) {
+      return d[dataField];
+    }));
 
       
   
@@ -237,7 +211,7 @@ function startDashboard() {
         .duration(300)
         .attr("d", d3.line()
           .curve(d3.curveBasis)
-          .x(function (d) { return x(d[0]); })
+          .x(function (d) { return xFiltered(d[0]); })
           .y(function (d) { return y(d[1]); })
         );
       
