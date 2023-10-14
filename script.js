@@ -2,6 +2,8 @@
 // Define a global variable to store the loaded CSV data
 var originalData;
 var currentData;
+// Create an object to store your scales
+const yScale = {};
 const codeToName = {"ATL" : "Atlanta Hawks",
   "BRK" : "Brooklyn Nets",
   "CHA" : "Charlotte Hornets",
@@ -157,8 +159,8 @@ function createBarCharts(){
     .padding(0.3);
   const xScaleW = d3.scaleLinear()
     .domain([0, d3.max(wTable, d => d.wins)])
-    .nice()
     .range([0, width / 2 - margin.left - margin.right - 100])
+    .nice();
   const fillScale = d3.scaleLinear()
     .domain([0,1])
     .range([0, 1]);
@@ -181,24 +183,29 @@ function createBarCharts(){
   svgW.append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
-    .call(d3.axisBottom(xScaleW));
+    .call(d3.axisBottom(xScaleW))
+    .style("font-family", "Nunito, sans-serif");
   // Add y-axis
   svgW.append("g")
     .attr("class", "y-axis")
-    .call(d3.axisLeft(yScaleW));
+    .call(d3.axisLeft(yScaleW))
+    .style("font-family", "Nunito, sans-serif");
   // Add X-axis legend
   svgW.append("text")
     .attr("class", "x-axis-legend")
     .attr("x", margin.left)
     .attr("y", height - margin.bottom + 20)
-    .text("Games won");
+    .text("Games won")
+    .style("font-family", "Nunito, sans-serif");
+    
   // Add Y-axis legend
   svgW.append("text")
     .attr("class", "y-axis-legend")
     .attr("transform", "rotate(-90)")
     .attr("x", -height / 2)
     .attr("y", -margin.left)
-    .text("Teams");
+    .text("Teams")
+    .style("font-family", "Nunito, sans-serif");
 
   // losses svg
   const svgL = d3
@@ -237,23 +244,27 @@ function createBarCharts(){
   svgL.append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
-    .call(d3.axisBottom(xScaleL));
+    .call(d3.axisBottom(xScaleL))
+    .style("font-family", "Nunito, sans-serif") // Set the font-family
   // Add y-axis
   svgL.append("g")
     .attr("class", "y-axis")
-    .call(d3.axisLeft(yScaleL));
+    .call(d3.axisLeft(yScaleL))
+    .style("font-family", "Nunito, sans-serif") // Set the font-family
   svgL.append("text")
     .attr("class", "x-axis-legend")
     .attr("x", margin.left)
     .attr("y", height - margin.bottom + 20)
-    .text("Games lost");
+    .text("Games lost")
+    .style("font-family", "Nunito, sans-serif") // Set the font-family
   // Add Y-axis legend
   svgL.append("text")
     .attr("class", "y-axis-legend")
     .attr("transform", "rotate(-90)")
     .attr("x", -height / 2)
     .attr("y", -margin.left)
-    .text("Teams");
+    .text("Teams")
+    .style("font-family", "Nunito, sans-serif") // Set the font-family
 }
 
 function winsandlosses(currentData){
@@ -305,13 +316,14 @@ function teamChange(team){
   }
   currentData = originalData.filter((d) => {return selectedTeams.has(d.opp)})
   updateBarChart(currentData)
+  updateParallelCoordinates(currentData)
 }
 // TODO : team selection
 
   
 function createParallelCoordinates() {
 
-  const width = 600; // - margin.left - margin.right;
+  //const width = 600; // - margin.left - margin.right;
   const deselectedColor = "rgb(221, 221, 221)";
   const brushWidth = 50;
 
@@ -372,8 +384,7 @@ function createParallelCoordinates() {
   dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
 
   
-  // Create an object to store your scales
-  const yScale = {};
+  
 
   // For each dimension, build a linear scale
   dimensions.forEach(function(dimension) {
@@ -394,30 +405,7 @@ function createParallelCoordinates() {
     .range([0, width])
     .domain(dimensions);
 
-  // Function to show tooltip
-  function showTooltip(event, d) {
-
-    season = d.season
-
-    // Create or select the tooltip element
-    let tooltip = d3.select("#tooltip");
-
-    // Show the tooltip
-    tooltip.transition().duration(10).style("opacity", 0.9);
-
-    // Position the tooltip at the cursor
-    tooltip.style("left", (event.pageX + 10) + "px")
-      .style("top", (event.pageY - 20) + "px");
-
-    // Set the tooltip text
-    tooltip.text(season);
-  }
-
-  // Function to hide the tooltip
-  function hideTooltip() {
-    // Hide the tooltip
-    d3.select("#tooltip").transition().duration(800).style("opacity", 0);
-  }
+ 
 
 
 
@@ -446,19 +434,20 @@ function createParallelCoordinates() {
       })
       .on("mouseleave", hideTooltip )
 
-  const dimensionMapping = {
-    "fg_percentage": "Field-goal %",
-    "free_throw_percentage": "Free-throw %",
-    "ast": "Assist",
-    "orb": "Offensive rebound",
-    "drb": "Defensive rebound",
-    "stl": "Steal",
-    "blk": "Block"
-  };
+    const dimensionMapping = {
+      "fg_percentage": "Field-goal %",
+      "free_throw_percentage": "Free-throw %",
+      "ast": "Assist",
+      "orb": "Offensive rebound",
+      "drb": "Defensive rebound",
+      "stl": "Steal",
+      "blk": "Block"
+    };
   
   function mapDimensionToTickValue(dimension) {
     return dimensionMapping[dimension] || dimension;
   }
+  
 
   // Draw the axis:
   svg.selectAll("myAxis")
@@ -475,64 +464,77 @@ function createParallelCoordinates() {
       .style("text-anchor", "middle")
       .attr("y", -9)
       .text((d) => mapDimensionToTickValue(d))
-      .style("fill", "black");
+      .style("fill", "black")
+      .style("font-family", "Nunito, sans-serif");
 
 
-  // Create the brush behavior along the y-axis.
-
+  
+/*
   const brush = d3.brushY()
     .extent([
       [-(brushWidth / 2), 0],
       [brushWidth / 2, height]
     ])
-    .on("start brush end", brushed);
+    .on("start brush end", function (event) {
+      console.log(event)
+    });// => brushed(event, key, originalData));
+    //.on("start brush end", brushed);
+    
+    */
  
-   // Attach the brush to the axes
+  // Create the brush behavior along the y-axis.
+   const brushes = []; // Create an array to store the brush instances
+
+   // Create the brushes for each axis
+   dimensions.forEach((key) => {
+     const brush = d3.brushY()
+       .extent([
+         [-(brushWidth / 2), 0],
+         [brushWidth / 2, height]
+       ])
+       .on("start brush end", function (event) {
+         brushed(event, key, originalData);
+       });
+   
+     brushes.push(brush); // Store the brush in the array
+   });
+   
+   // Attach the brushes to the axes
+   const axes = svg.selectAll(".axis");
+   axes.each(function (d, i) {
+     d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
+   });
+
+/*
   const axes = svg.selectAll(".axis");
   axes.call(brush);
- /*
-  const selections = new Map();
+  */
  
-  function brushed({ selection }, key) {
-    if (selection === null) selections.delete(key);
-    else selections.set(key, selection.map(yScale[key].invert));
- 
-    const selected = [];
- 
-    // Iterate through the paths and update their appearance based on the selection
-    svg.selectAll(".line")
-    .each(function(d) {
-      // Initialize an 'active' flag to true
-      let active = true;
-      
-      // Check for each selection whether the data point falls within the range
-      Array.from(selections).forEach(([key, [max, min]]) => {
-        const value = +d[key];
-        min = +min
-        max = +max
-        
-        if (!(value >= min && value <= max)) {
-          active = false; // Set 'active' to false if any selection matches
-        } 
-      
-      });
-  
-      // Update the line's appearance based on the 'active' flag
-      d3.select(this)
-        .style("stroke", active ? colorScale(d.season) : deselectedColor);
-  
-      if (active) {
-        d3.select(this).raise();
-        selected.push(d);
-      }
-      d3.selectAll(".brush").raise();
-    });
-     
- 
-     // Dispatch an event with the selected data
-     svg.property("value", selected).dispatch("input");
-   }
-   */
+}
+
+ // Function to show tooltip
+ function showTooltip(event, d) {
+
+  season = d.season
+
+  // Create or select the tooltip element
+  let tooltip = d3.select("#tooltip");
+
+  // Show the tooltip
+  tooltip.transition().duration(10).style("opacity", 0.9);
+
+  // Position the tooltip at the cursor
+  tooltip.style("left", (event.pageX + 10) + "px")
+    .style("top", (event.pageY - 20) + "px");
+
+  // Set the tooltip text
+  tooltip.text(`Season: ${season}\nOpponent: ${d.opp}`);
+}
+
+// Function to hide the tooltip
+function hideTooltip() {
+  // Hide the tooltip
+  d3.select("#tooltip").transition().duration(800).style("opacity", 0);
 }
 
 

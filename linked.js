@@ -24,7 +24,7 @@ function handleMouseOutBarChart(event, item){
 // Brushing functionality of the parallel coordinates plot
 const selections = new Map();
  
-function brushed({ selection }, key) {
+function brushed({ selection }, key, data) {
   const deselectedColor = "rgb(221, 221, 221)";
   const brushWidth = 50;
 
@@ -57,6 +57,7 @@ function brushed({ selection }, key) {
     .domain(["2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11", "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04", "2002-03"])
     .range(customColors);
 
+    /*
   // Create an object to store your scales
   const yScale = {};
 
@@ -74,6 +75,12 @@ function brushed({ selection }, key) {
     // Store the scale in the yScale
     yScale[dimension] = scale;
   });
+
+  */
+
+  /*
+  const yScale = createYScale(data, dimensions);
+  */
 
   if (selection === null) selections.delete(key);
   else selections.set(key, selection.map(yScale[key].invert));
@@ -108,13 +115,31 @@ function brushed({ selection }, key) {
       selected.push(d);
     }
     d3.selectAll(".brush").raise();
+    d3.select("#parallelCoordinates").selectAll(".axis").raise();
   });
     
-    currentData = originalData.filter((d) => {return selected.includes(d)});   
+    currentData = data.filter((d) => {return selected.includes(d)});   
 
     // Dispatch an event with the selected data
     d3.select("#parallelCoordinates").property("value", selected).dispatch("input");
 
     // Update other plots
     updateBarChart(currentData);
-  }
+}
+
+function createYScale(data, dimensions) {
+  const yScale = {};
+
+  dimensions.forEach(function (dimension) {
+    const min = d3.min(data, (d) => +d[dimension]);
+    const max = d3.max(data, (d) => +d[dimension]);
+
+    const scale = d3.scaleLinear()
+      .domain([min, max])
+      .range([height, 0]);
+
+    yScale[dimension] = scale;
+  });
+
+  return yScale;
+}
