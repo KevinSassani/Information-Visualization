@@ -244,7 +244,7 @@ function createParallelCoordinates(originalData) {
    // Attach the brush to the axes
   const axes = svg.selectAll(".axis");
   axes.call(brush);
- 
+ /*
   const selections = new Map();
  
   function brushed({ selection }, key) {
@@ -286,6 +286,7 @@ function createParallelCoordinates(originalData) {
      // Dispatch an event with the selected data
      svg.property("value", selected).dispatch("input");
    }
+   */
 }
 
 
