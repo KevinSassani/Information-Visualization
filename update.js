@@ -129,7 +129,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
       .transition()
       .duration(500)
       .call(d3.axisLeft(yScaleL).tickSizeOuter(0));
-    // Add tooltips to all bars with the movie title as the content
+    // Add tooltips to all bars 
     svgL
       .selectAll(".bar")
       .on("mouseover", handleMouseOveBarChart)
