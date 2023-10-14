@@ -1,6 +1,6 @@
 // Global data variable
 // Define a global variable to store the loaded CSV data
-var csvData;
+var originalData;
 
 // Define margin and dimensions for the charts
 const margin = {
@@ -26,11 +26,11 @@ function startDashboard() {
   }
   
   importFiles('GamesData.csv').then(function (results) {
-    csvData = results[0];
+    originalData = results[0];
 
     /*
     // Convert incomeperperson and alcconsumption data to numbers
-    csvData.forEach(function (d) {
+    originalData.forEach(function (d) {
       d.tm = +d.tm 
       d.opp_score = +d.opp_score
       d.fg = +d.fg
@@ -56,14 +56,14 @@ function startDashboard() {
 
 
     // Call functions to create the plots
-    createParallelCoordinates(csvData); //Define width inside this function
+    createParallelCoordinates(originalData); //Define width inside this function
     createDensityPlot(); //Define width inside this function
   })
 
   }
 
   
-function createParallelCoordinates(csvData) {
+function createParallelCoordinates(originalData) {
 
   const width = 600; // - margin.left - margin.right;
   const deselectedColor = "rgb(221, 221, 221)";
@@ -132,8 +132,8 @@ function createParallelCoordinates(csvData) {
   // For each dimension, build a linear scale
   dimensions.forEach(function(dimension) {
     // Get the min and max values for the dimension
-    const min = d3.min(csvData, d => +d[dimension]);
-    const max = d3.max(csvData, d => +d[dimension]);
+    const min = d3.min(originalData, d => +d[dimension]);
+    const max = d3.max(originalData, d => +d[dimension]);
 
     // Create a linear scale for the dimension
     const scale = d3.scaleLinear()
@@ -182,7 +182,7 @@ function createParallelCoordinates(csvData) {
 
   // Draw the lines
   svg.selectAll("path")
-    .data(csvData)
+    .data(originalData)
     .join("path")
       .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
       .attr("d",  (d) => path(d))
