@@ -1,6 +1,6 @@
 // Global data variable
 // Define a global variable to store the loaded CSV data
-var csvData;
+var originalData;
 
 // Define margin and dimensions for the charts
 const margin = {
@@ -26,11 +26,11 @@ function startDashboard() {
   }
   
   importFiles('GamesData.csv').then(function (results) {
-    csvData = results[0];
+    originalData = results[0];
 
     
     // Convert incomeperperson and alcconsumption data to numbers
-    csvData.forEach(function (d) {
+    originalData.forEach(function (d) {
       d.tm = +d.tm 
       d.opp_score = +d.opp_score
       d.fg = +d.fg
