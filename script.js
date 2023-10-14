@@ -79,10 +79,48 @@ function createParallelCoordinates(csvData) {
             `translate(${margin.left},${margin.top})`);
 
   // Color scale: different colors for each season
+  var customColors = [
+    "#007A33", // Boston Celtics' green
+    "#BA9653", // Custom color 2
+    "#FFFFFF", // White
+    "#000000", // Black
+    "#C8102E", // Another shade of green
+    "#D13870", // Another shade of green
+    "#D6A06F", // A light brownish color
+    "#007-DC3", // Another shade of green
+    "#B7A248", // A yellowish color
+    "#4A90E2", // A blue color
+    "#E03A3E", // A bright red color
+    "#FFA25D", // An orange color
+    "#6C6073", // A dark gray color
+    "#D7C6BB", // A light gray color
+    "#FF5736", // A bright orange color
+    "#00B2A9", // A teal color
+    "#4F0D3E", // A dark purple color
+    "#E2D1C3", // A light peach color
+    "#00A79D", // Another shade of teal
+    "#706962", // A dark olive green color
+    "#FDB927"  // A bright yellow color
+  ];
+
   var colorScale = d3.scaleOrdinal()
     .domain(["2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11", "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04", "2002-03"])
-    .range(getHueScaleColors(20, 50, 300));
+    .range(customColors);
+    //.range(getHueScaleColors(20, 50, 300));
 
+  /*
+  var colors = d3.scaleSequential()
+  .domain([0, 1]) // Define a dummy domain from 0 to 1
+  .interpolator(d3.interpolateBrBG); // Use the interpolation function
+
+  var domainValues = ["2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11", "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04", "2002-03"];
+
+  var colorScale = d3.scaleOrdinal()
+    .domain(domainValues)
+    .range(domainValues.map(function(value, index, array) {
+      return colors(index / (array.length - 1));
+    }));
+*/
 
   // Choose dimensions to include in the plot
   dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
