@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+
         <title>Boston Celtics Dashboard</title>
         <style>
             .container {
@@ -31,22 +32,45 @@
                 padding: 20px;
                 text-align: center;
             }
-        </style>
+
+            #slider-container .tick text {
+                padding: 0;
+                margin: 0;
+            }
+
+            
+         
+        
+      
+       
+   </style>
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://d3js.org/d3.v6.js"></script>
         <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.4/nouislider.min.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://unpkg.com/d3-simple-slider"></script>
+
+
+
+
         <script src="script.js"></script>
         <script src="linked.js"></script>
     </head>
-    <header> 
-        <div id="seasonSlider"></div>
-        <div id="teamMenu"></div> <!--Might not be needed as we can click in the bar chart-->
-    </header>
     <body onload="startDashboard()">
+        <header> 
+            <div id="seasonSlider"></div>
+            <div id="teamMenu"></div>
+        </header>
         <div class="dashboard">
             <div class="visualization" id="parallelCoordinates"></div>
-            <div class="visualization" id="densityPlot"></div>
+            <div class="visualization" id="densityPlot">
+                <div id="slider-tm"></div>
+                <div id="slider-opp_score"></div>
+            </div>
             <div class="visualization" id="barCharts"></div>
             <div class="visualization" id="heatMap"></div>
         </div>
     </body>
+    
 </html>
