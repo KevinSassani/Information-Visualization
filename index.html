@@ -8,15 +8,16 @@
             }
             .dashboard {
                 display: grid;
+                height: 400px;
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr;
-                gap: 20px;
+                
                 padding: 20px;
             }
             header {
-                background-color: #333;
+                background-color: #d4b26e;
                 color: #fff;
-                height: 8vh; /* 1/10 of viewport height */
+                max-height: 5vh; /* 1/10 of viewport height */
                 width: 100%;
                 text-align: center;
                 display: flex;
@@ -30,23 +31,97 @@
                 border: 1px solid #ddd;
                 padding: 20px;
                 text-align: center;
+                object-fit: contain;
+            }
+
+            #barCharts{
+                text-align: justify;
+            }
+            .multiselect {
+            width: 200px;
+            }
+
+            .selectBox {
+            position: relative;
+            }
+
+            .selectBox select {
+            width: 100%;
+            }
+
+            .overSelect {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            }
+
+            #checkboxes {
+            display: none;
+            border: 1px #dadada solid;
+            overflow: scroll;
+            height: 6vh;
+            text-align: left;
+            }
+
+            #checkboxes label {
+            display: block;
+            font-size: small;
+            color: white;
+            }
+
+            #checkboxes label:hover {
+            background-color: #1e90ff;
+            }
+            .tooltip {
+                position: absolute;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                padding: 10px;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+            .heatmap-image {
+                max-width: 50%;
+                max-height: 100%;
+                object-fit: contain; /* You can use "cover" or "scale-down" based on your preference */
             }
         </style>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
         <script src="script.js"></script>
+        <script src="update.js"></script>
         <script src="linked.js"></script>
     </head>
     <header> 
         <div id="seasonSlider"></div>
-        <div id="teamMenu"></div> <!--Might not be needed as we can click in the bar chart-->
+        <div id="teamMenu">
+            <form>
+                <div class="multiselect">
+                  <div class="selectBox" onclick="showCheckboxes()">
+                    <select>
+                      <option>Select teams</option>
+                    </select>
+                    <div class="overSelect"></div>
+                  </div>
+                  <div id="checkboxes">
+                  </div>
+                </div>
+              </form>
+        </div> <!--Might not be needed as we can click in the bar chart-->
     </header>
     <body onload="startDashboard()">
+        <div class="tooltip" id="tooltip">
+            <svg width="100" height="100">
+            </svg>
+          </div>
         <div class="dashboard">
             <div class="visualization" id="parallelCoordinates"></div>
-            <div class="visualization" id="densityPlot"></div>
+            <div class="visualization" id="densityPlot"><img src="densityPIC.jpg" alt="Density plot" class="heatmap-image"></div>
             <div class="visualization" id="barCharts"></div>
-            <div class="visualization" id="heatMap"></div>
+            <div class="visualization" id="heatMap"><img src="mapofcourtPICTURE.jpg" alt="Map of the Court" class="heatmap-image"></div>
         </div>
     </body>
 </html>
