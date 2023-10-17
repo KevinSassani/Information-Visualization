@@ -525,9 +525,12 @@ function createParallelCoordinates() {
 }
 
 function createDensityPlot() {
-    var margin = { top: 30, right: 30, bottom: 30, left: 50 },
-      width = 460 - margin.left - margin.right,
-      height = 400 - margin.top - margin.bottom;
+    // Get the container div element
+    const containerDiv = document.getElementById("parallelCoordinates");
+
+    // Get the width and height of the container using getBoundingClientRect()
+    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
   
     var svg = d3.select("#densityPlot")
       .append("svg")
@@ -550,10 +553,10 @@ function createDensityPlot() {
   
     const sliderRange = d3
       .sliderBottom()
-      .min(d3.min(csvData, d => Math.min(d.tm, d.opp_score)))
-      .max(d3.max(csvData, d => Math.max(d.tm, d.opp_score)))
+      .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
+      .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
       .width(300)
-      .default([d3.min(csvData, d => Math.min(d.tm, d.opp_score)), d3.max(csvData, d => Math.max(d.tm, d.opp_score))])
+      .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
       .fill('#85bb65')
       .ticks(0);
     
@@ -581,10 +584,10 @@ function createDensityPlot() {
   
     const sliderRange2 = d3
       .sliderBottom()
-      .min(d3.min(csvData, d => Math.min(d.tm, d.opp_score)))
-      .max(d3.max(csvData, d => Math.max(d.tm, d.opp_score)))
+      .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
+      .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
       .width(300)
-      .default([d3.min(csvData, d => Math.min(d.tm, d.opp_score)), d3.max(csvData, d => Math.max(d.tm, d.opp_score))])
+      .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
       .fill('#404080');
   
     sliderRange2.on('onchange', val2 => {
@@ -597,8 +600,8 @@ function createDensityPlot() {
   
     var x = d3.scaleLinear()
       .domain([
-        d3.min(csvData, function (d) { return Math.min(d.tm, d.opp_score); }),
-        d3.max(csvData, function (d) { return Math.max(d.tm, d.opp_score); })
+        d3.min(originalData, function (d) { return Math.min(d.tm, d.opp_score); }),
+        d3.max(originalData, function (d) { return Math.max(d.tm, d.opp_score); })
       ])
       .nice()
       .range([0, width]);
@@ -638,7 +641,7 @@ function createDensityPlot() {
       const fieldToFilter = dataField === 'tm' ? 'tm' : 'opp_score';
 
       // Filter the data based on the selected field
-      const filteredData = csvData.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
+      const filteredData = originalData.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
 
       console.log(filteredData)
 
@@ -679,7 +682,7 @@ function createDensityPlot() {
   
     function createInitialDensityPlot(dataField) {
       var kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(60));
-      var density = kde(csvData.map(function (d) {
+      var density = kde(originalData.map(function (d) {
         return d[dataField]; // 'tm' or 'opp_score'
       }));
   
