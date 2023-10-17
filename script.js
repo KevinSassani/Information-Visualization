@@ -705,6 +705,7 @@ function createDensityPlot() {
 
     }
 
+  }
  // Function to show tooltip
  function showTooltip(event, d) {
 
@@ -789,4 +790,5 @@ function getHueScaleColors(count, startHue, endHue) {
 
   return colors;
 }
+
 
