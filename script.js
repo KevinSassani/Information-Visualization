@@ -157,11 +157,11 @@ function createBarCharts(){
   const svgW = d3
     .select("#barCharts")
     .append("svg")
-    .attr("width", (width - margin.left) / 2 - padding)
+    .attr("width", (width)/2)
     .attr("height", height)
     .append("g")
     .attr("id", "winsBarChart")
-    .attr("transform", `translate(${2*margin.left},${margin.top})`);
+    .attr("transform", `translate(${50 + margin.left},${margin.top})`);
   // Define scales
   const yScaleW = d3.scaleBand()
     .domain(wTable.map(d => d.name))
@@ -169,7 +169,7 @@ function createBarCharts(){
     .padding(0.3);
   const xScaleW = d3.scaleLinear()
     .domain([0, d3.max(wTable, d => d.wins)])
-    .range([0, width / 2 - margin.left - margin.right - 100])
+    .range([0, width / 2 - margin.left - margin.right - 10])
     .nice();
   const fillScale = d3.scaleLinear()
     .domain([0,1])
@@ -221,11 +221,11 @@ function createBarCharts(){
   const svgL = d3
     .select("#barCharts")
     .append("svg")
-    .attr("width", (width - margin.left) / 2 - padding)
+    .attr("width", (width) / 2)
     .attr("height", height)
     .append("g")
     .attr("id", "lossesBarChart")
-    .attr("transform", `translate(${margin.left*3},${margin.top})`);
+    .attr("transform", `translate(${margin.left + 50},${margin.top})`);
   // Define scales
   const yScaleL = d3.scaleBand()
     .domain(lTable.map(d => d.name))
@@ -234,7 +234,7 @@ function createBarCharts(){
   const xScaleL = d3.scaleLinear()
     .domain([0, d3.max(lTable, d => d.losses)])
     .nice()
-    .range([0, width / 2 - margin.left - margin.right - 100])
+    .range([0, width / 2 - margin.left - margin.right - 10])
   // Create and append the bars
   svgL.selectAll(".bar")
     .data(lTable)

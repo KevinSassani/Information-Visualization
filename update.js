@@ -1,4 +1,13 @@
 function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
+    // Get the container div element
+    const containerDiv = document.getElementById("barCharts");
+
+    // Get the width and height of the container using getBoundingClientRect()
+    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
+    const padding = 30  
+  
     wlTable = winsandlosses(data)
     wTable = wlTable[0]
     lTable = wlTable[1]
@@ -19,7 +28,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     const xScaleW = d3.scaleLinear()
       .domain([0, maxWins])
       .nice()
-      .range([0, width / 2 - margin.left - margin.right - 100]);
+      .range([0, width / 2 - margin.left - margin.right - 10]);
 
     const fillScale = d3.scaleLinear()
       .domain([0,1])
@@ -91,7 +100,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     const xScaleL = d3.scaleLinear()
       .domain([0, maxLosses])
       .nice()
-      .range([0, width / 2 - margin.left - margin.right - 100]);
+      .range([0, width / 2 - margin.left - margin.right - 10]);
 
     // Update the x-axis
     svgL.select(".x-axis")
@@ -143,6 +152,14 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
   function updateParallelCoordinates(data) {
     const deselectedColor = "rgb(221, 221, 221)";
     const brushWidth = 50;
+
+    // Get the container div element
+    const containerDiv = document.getElementById("parallelCoordinates");
+
+    // Get the width and height of the container using getBoundingClientRect()
+    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
 
     // Choose dimensions to include in the plot
     dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
