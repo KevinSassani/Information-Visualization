@@ -526,39 +526,39 @@ function createParallelCoordinates() {
 
 function createDensityPlot() {
     // Get the container div element
-    const containerDiv = document.getElementById("parallelCoordinates");
+    const containerDiv = document.getElementById("densityPlotFigure");
 
     // Get the width and height of the container using getBoundingClientRect()
     const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
     const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
   
-    var svg = d3.select("#densityPlot")
+    const sliderHeight = 200;
+
+    var svg = d3.select("#densityPlotFigure")
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   
-    var sliderContainer = d3.select("#densityPlot")
-      .append("div")
-      .attr("id", "slider-container");
+    
+    var sliderContainer = d3.select("#slider-tm").classed("slider-container", true);
       
   
     var sliderSvg = sliderContainer.append("svg")
-      .attr("id", "slider")
-      .attr("width", 320)
-      .attr("height", 50);;
-    
+      //.attr("id", "slider")
+      .attr("width", "100%")
+      .attr("height", "100%");;
     
   
     const sliderRange = d3
-      .sliderBottom()
+      .sliderVertical()
       .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
       .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
-      .width(300)
+      .height(sliderHeight)
       .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
-      .fill('#85bb65')
-      .ticks(0);
+      .fill('#85bb65');
+      //.ticks(0);
     
   
     sliderRange.on('onchange', val => {
@@ -572,21 +572,19 @@ function createDensityPlot() {
 
 
 
-    var sliderContainer = d3.select("#densityPlot")
-      .append("div")
-      .attr("id", "slider-container");
+    var sliderContainer = d3.select("#slider-opp_score").classed("slider-container", true);
     
   
     var sliderSvg2 = sliderContainer.append("svg")
-      .attr("id", "slider")
-      .attr("width", 320)
-      .attr("height", 50);
+      //.attr("id", "slider")
+      .attr("width", "100%")
+      .attr("height", "100%");
   
     const sliderRange2 = d3
-      .sliderBottom()
+      .sliderVertical()
       .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
       .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
-      .width(300)
+      .height(sliderHeight)
       .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
       .fill('#404080');
   
@@ -610,8 +608,6 @@ function createDensityPlot() {
       .attr("class", "x-axis")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x));
-  
-
 
 
     var y = d3.scaleLinear()

@@ -43,7 +43,28 @@
             }
             #densityPlot {
                 grid-area: densitysect;
+                display: grid;
+                grid-template-columns: 70% 30%;
+                grid-template-rows: 100%;
+                grid-template-areas: "densityPlot_fig sliderContainer";
+            }
+            #densityPlotFigure {
+                grid-area: densityPlot_fig;
                 object-fit: contain;
+            }
+            #densityPlotSliderContainer {
+                grid-area: sliderContainer;
+                display: grid;
+                grid-template-columns: 50% 50%;
+                grid-template-rows: 100%;
+                grid-template-areas: "slider_team slider_opp";
+            }
+            #slider-tm {
+                grid-area: slider_team;
+            }
+
+            #slider-opp_score {
+                grid-area: slider_opp;
             }
         
             #heatMap {
@@ -105,9 +126,10 @@
                 max-height: 20%;
                 object-fit: contain; /* You can use "cover" or "scale-down" based on your preference */
             }
-            #slider-container .tick text {
-                  padding: 0;
-                  margin: 0;
+            .slider-container, .tick text {
+                display: flex;
+                justify-content: center;
+                align-items: center;
               }
         </style>
         <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -142,9 +164,12 @@
                 </div> <!--Might not be needed as we can click in the bar chart-->
             </header>
             <div class="visualization" id="parallelCoordinates"></div>
-            <div class="visualization" id="densityPlot">
-                <div id="slider-tm"></div>
-                <div id="slider-opp_score"></div>
+            <div id="densityPlot">
+                <div class = "visualization" id="densityPlotFigure"></div>
+                <div id = "densityPlotSliderContainer">
+                    <div class = "slider-container" id="slider-tm"></div>
+                    <div class = "slider-container" id="slider-opp_score"></div>
+                </div>
             </div>
             <div class="visualization" id="barCharts"></div>
             <div class="visualization" id="heatMap"><img src="mapofcourtPICTURE.jpg" alt="Map of the Court" class="heatmap-image"></div>
