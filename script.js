@@ -563,6 +563,188 @@ function createParallelCoordinates() {
  
 }
 
+function createDensityPlot() {
+    // Get the container div element
+    const containerDiv = document.getElementById("densityPlotFigure");
+
+    // Get the width and height of the container using getBoundingClientRect()
+    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+  
+    const sliderHeight = 200;
+
+    var svg = d3.select("#densityPlotFigure")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  
+    
+    var sliderContainer = d3.select("#slider-tm").classed("slider-container", true);
+      
+  
+    var sliderSvg = sliderContainer.append("svg")
+      //.attr("id", "slider")
+      .attr("width", "100%")
+      .attr("height", "100%");;
+    
+  
+    const sliderRange = d3
+      .sliderVertical()
+      .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
+      .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
+      .height(sliderHeight)
+      .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
+      .fill('#85bb65');
+      //.ticks(0);
+    
+  
+    sliderRange.on('onchange', val => {
+      //x.domain(val);
+      minSliderValue = val[0];
+      maxSliderValue = val[1];
+      redrawDensityPlot('tm', minSliderValue, maxSliderValue);
+    });
+  
+    sliderSvg.call(sliderRange);
+
+
+
+    var sliderContainer = d3.select("#slider-opp_score").classed("slider-container", true);
+    
+  
+    var sliderSvg2 = sliderContainer.append("svg")
+      //.attr("id", "slider")
+      .attr("width", "100%")
+      .attr("height", "100%");
+  
+    const sliderRange2 = d3
+      .sliderVertical()
+      .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
+      .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
+      .height(sliderHeight)
+      .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
+      .fill('#404080');
+  
+    sliderRange2.on('onchange', val2 => {
+      minSliderValue2 = val2[0];
+      maxSliderValue2 = val2[1];
+      redrawDensityPlot('opp_score', minSliderValue2, maxSliderValue2);
+    });
+  
+    sliderSvg2.call(sliderRange2);
+  
+    var x = d3.scaleLinear()
+      .domain([
+        d3.min(originalData, function (d) { return Math.min(d.tm, d.opp_score); }),
+        d3.max(originalData, function (d) { return Math.max(d.tm, d.opp_score); })
+      ])
+      .nice()
+      .range([0, width]);
+  
+    svg.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+
+    var y = d3.scaleLinear()
+      .range([height, 0])
+      .domain([0, 0.06]);
+      
+    svg.append("g")
+      .attr("class", "y-axis")
+      .call(d3.axisLeft(y));
+  
+    function kernelDensityEstimator(kernel, X) {
+      return function (V) {
+        return X.map(function (x) {
+          return [x, d3.mean(V, function (v) { return kernel(x - v); })];
+        });
+      }
+    }
+  
+    function kernelEpanechnikov(k) {
+      return function (v) {
+        return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+      };
+    }
+  
+    function redrawDensityPlot(dataField, min, max) {
+
+      const fieldToFilter = dataField === 'tm' ? 'tm' : 'opp_score';
+
+      // Filter the data based on the selected field
+      const filteredData = originalData.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
+
+      console.log(filteredData)
+
+      // Calculate the max and min values for the filtered "tm" data
+      var xFiltered = d3.scaleLinear()
+        .domain([56, 150]) // Fixed x-axis domain
+        .nice()
+        .range([0, width]);
+      
+
+      console.log(min)
+      console.log(max)
+      // Update the x-axis domain
+      
+      
+      var kde = kernelDensityEstimator(kernelEpanechnikov(7), xFiltered.ticks(60));
+      var density = kde(filteredData.map(function (d) {
+      return d[dataField];
+    }));
+
+      
+  
+      svg.select(".mypath-" + dataField)
+        .datum(density)
+        .transition()
+        .duration(300)
+        .attr("d", d3.line()
+          .curve(d3.curveBasis)
+          .x(function (d) { return xFiltered(d[0]); })
+          .y(function (d) { return y(d[1]); })
+        );
+      
+    }
+  
+    // Create the initial density plots for both 'tm' and 'opp_score'
+    createInitialDensityPlot('tm');
+    createInitialDensityPlot('opp_score');
+  
+    function createInitialDensityPlot(dataField) {
+      var kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(60));
+      var density = kde(originalData.map(function (d) {
+        return d[dataField]; // 'tm' or 'opp_score'
+      }));
+  
+      svg.append("path")
+        .attr("class", "mypath-" + dataField)
+        .datum(density)
+        .attr("fill", dataField === 'tm' ? "#69b3a2" : "#404080")
+        .attr("opacity", ".6")
+        .attr("stroke", "#000")
+        .attr("stroke-width", 1)
+        .attr("stroke-linejoin", "round")
+        .attr("d", d3.line()
+          .curve(d3.curveBasis)
+          .x(function (d) { return x(d[0]); })
+          .y(function (d) { return y(d[1]); })
+        );
+  
+      // Add legend
+      svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", 6).style("fill", dataField === 'tm' ? "#69b3a2" : "#404080");
+      svg.append("text").attr("x", 320).attr("y", 30).text(dataField).style("font-size", "15px").attr("alignment-baseline", "middle");
+
+  
+
+    }
+
+  }
+
  // Function to show tooltip
  function showTooltip(event, d) {
 
