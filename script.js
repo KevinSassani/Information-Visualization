@@ -46,10 +46,10 @@ const selectedTeams = new Set(Object.keys(codeToName));
 
 // Define margin and dimensions for the charts
 const margin = {
-  top: 20,
-  right: 40,
-  bottom: 50,
-  left: 40,
+  top: 30,
+  right: 50,
+  bottom: 30,
+  left: 50
 };
 
 // show team checkbox
@@ -82,10 +82,10 @@ function showCheckboxes() {
     expanded = false;
   }
 }
-const padding = 20
+
 
 const width = (window.screen.width - margin.left - margin.right) / 2;
-const height = (window.screen.height - margin.top - margin.bottom) / 2;
+const height = (window.screen.height - margin.top - margin.bottom) / 3;
 
 // Function to start the dashboard
 function startDashboard() {
@@ -138,6 +138,16 @@ function startDashboard() {
   };
 
 function createBarCharts(){
+
+  // Get the container div element
+  const containerDiv = document.getElementById("barCharts");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
+  const padding = 30
+
   // first make a count for each opponent team of wins and loses.
   wlTable = winsandlosses(currentData)
   wTable = wlTable[0]
@@ -215,7 +225,7 @@ function createBarCharts(){
     .attr("height", height)
     .append("g")
     .attr("id", "lossesBarChart")
-    .attr("transform", `translate(${margin.left*2},${margin.top})`);
+    .attr("transform", `translate(${margin.left*3},${margin.top})`);
   // Define scales
   const yScaleL = d3.scaleBand()
     .domain(lTable.map(d => d.name))
@@ -327,14 +337,20 @@ function createParallelCoordinates() {
   const deselectedColor = "rgb(221, 221, 221)";
   const brushWidth = 50;
 
+  // Get the container div element
+  const containerDiv = document.getElementById("parallelCoordinates");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
   const svg = d3
     .select("#parallelCoordinates")
     .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.bottom + margin.top)
     .append("g")
-      .attr("transform",
-            `translate(${margin.left},${margin.top})`);
+      .attr("transform",`translate(${margin.left},${margin.top})`);
 
   // Color scale: different colors for each season
   var customColors = [
@@ -404,10 +420,6 @@ function createParallelCoordinates() {
   xScale = d3.scalePoint()
     .range([0, width])
     .domain(dimensions);
-
- 
-
-
 
   // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
   function path(d) {
