@@ -46,10 +46,10 @@ const selectedTeams = new Set(Object.keys(codeToName));
 
 // Define margin and dimensions for the charts
 const margin = {
-  top: 20,
-  right: 40,
-  bottom: 50,
-  left: 40,
+  top: 30,
+  right: 50,
+  bottom: 30,
+  left: 50
 };
 
 // show team checkbox
@@ -82,10 +82,10 @@ function showCheckboxes() {
     expanded = false;
   }
 }
-const padding = 20
+
 
 const width = (window.screen.width - margin.left - margin.right) / 2;
-const height = (window.screen.height - margin.top - margin.bottom) / 2;
+const height = (window.screen.height - margin.top - margin.bottom) / 3;
 
 // Function to start the dashboard
 function startDashboard() {
@@ -138,6 +138,16 @@ function startDashboard() {
   };
 
 function createBarCharts(){
+
+  // Get the container div element
+  const containerDiv = document.getElementById("barCharts");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
+  const padding = 30
+
   // first make a count for each opponent team of wins and loses.
   wlTable = winsandlosses(currentData)
   wTable = wlTable[0]
@@ -147,11 +157,11 @@ function createBarCharts(){
   const svgW = d3
     .select("#barCharts")
     .append("svg")
-    .attr("width", (width - margin.left) / 2 - padding)
+    .attr("width", (width)/2)
     .attr("height", height)
     .append("g")
     .attr("id", "winsBarChart")
-    .attr("transform", `translate(${2*margin.left},${margin.top})`);
+    .attr("transform", `translate(${50 + margin.left},${margin.top})`);
   // Define scales
   const yScaleW = d3.scaleBand()
     .domain(wTable.map(d => d.name))
@@ -159,7 +169,7 @@ function createBarCharts(){
     .padding(0.3);
   const xScaleW = d3.scaleLinear()
     .domain([0, d3.max(wTable, d => d.wins)])
-    .range([0, width / 2 - margin.left - margin.right - 100])
+    .range([0, width / 2 - margin.left - margin.right - 10])
     .nice();
   const fillScale = d3.scaleLinear()
     .domain([0,1])
@@ -211,11 +221,11 @@ function createBarCharts(){
   const svgL = d3
     .select("#barCharts")
     .append("svg")
-    .attr("width", (width - margin.left) / 2 - padding)
+    .attr("width", (width) / 2)
     .attr("height", height)
     .append("g")
     .attr("id", "lossesBarChart")
-    .attr("transform", `translate(${margin.left*2},${margin.top})`);
+    .attr("transform", `translate(${margin.left + 50},${margin.top})`);
   // Define scales
   const yScaleL = d3.scaleBand()
     .domain(lTable.map(d => d.name))
@@ -224,7 +234,7 @@ function createBarCharts(){
   const xScaleL = d3.scaleLinear()
     .domain([0, d3.max(lTable, d => d.losses)])
     .nice()
-    .range([0, width / 2 - margin.left - margin.right - 100])
+    .range([0, width / 2 - margin.left - margin.right - 10])
   // Create and append the bars
   svgL.selectAll(".bar")
     .data(lTable)
@@ -327,14 +337,20 @@ function createParallelCoordinates() {
   const deselectedColor = "rgb(221, 221, 221)";
   const brushWidth = 50;
 
+  // Get the container div element
+  const containerDiv = document.getElementById("parallelCoordinates");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
   const svg = d3
     .select("#parallelCoordinates")
     .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.bottom + margin.top)
     .append("g")
-      .attr("transform",
-            `translate(${margin.left},${margin.top})`);
+      .attr("transform",`translate(${margin.left},${margin.top})`);
 
   // Color scale: different colors for each season
   var customColors = [
@@ -404,10 +420,6 @@ function createParallelCoordinates() {
   xScale = d3.scalePoint()
     .range([0, width])
     .domain(dimensions);
-
- 
-
-
 
   // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
   function path(d) {
