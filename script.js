@@ -43,6 +43,7 @@ for(k in codeToName) nameToCode[codeToName[k]] = k
 
 // Define variable to know if the team is selected or not
 const selectedTeams = new Set(Object.keys(codeToName));
+var selectAllTeams = true;
 
 // Define margin and dimensions for the charts
 const margin = {
@@ -56,6 +57,19 @@ const margin = {
 var expanded = false;
 function showCheckboxes() {
   var checkboxes = document.getElementById("checkboxes");
+  // Select All tick
+  const allCheckbox = document.createElement('input');
+  allCheckbox.type = 'checkbox';
+  allCheckbox.id = "selectAll"
+  allCheckbox.checked = true;
+  allCheckbox.onchange = () => selectAll();
+  const allLabel = document.createElement('label');
+  allLabel.htmlFor = "selectAll";
+  allLabel.appendChild(allCheckbox);
+  allLabel.appendChild(document.createTextNode("Select all"));
+  checkboxes.appendChild(allLabel);
+  
+  // Select for each team
   Object.keys(nameToCode).forEach(key => {
     // Create a checkbox input element
     const checkbox = document.createElement('input');
@@ -325,11 +339,35 @@ function teamChange(team){
     selectedTeams.add(team)
   }
   currentData = originalData.filter((d) => {return selectedTeams.has(d.opp)})
+  selectAllTeams = false
+  document.getElementById("selectAll").checked = false
   updateBarChart(currentData)
   updateParallelCoordinates(currentData)
 }
 // TODO : team selection
 
+function selectAll(){
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  if(!selectAllTeams){
+    currentData = originalData
+    Object.keys(codeToName).forEach(element => {
+      selectedTeams.add(element)
+    });
+    for (let i = 0; i < checkboxes.length; i++) {
+      checkboxes[i].checked = true;
+    }
+    selectAllTeams = true
+  }else{
+    currentData = []
+    selectedTeams.clear()
+    for (let j = 0; j < checkboxes.length; j++) {
+      checkboxes[j].checked = false;
+    }
+    selectAllTeams = false
+  }
+  updateBarChart(currentData)
+  updateParallelCoordinates(currentData)
+}
   
 function createParallelCoordinates() {
 
@@ -429,7 +467,8 @@ function createParallelCoordinates() {
   // Draw the lines
   svg.selectAll("path")
     .data(originalData)
-    .join("path")
+    .enter()
+    .append("path")
       .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
       .attr("d",  (d) => path(d))
       .style("fill", "none" )

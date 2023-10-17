@@ -69,7 +69,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("height", yScaleW.bandwidth())
     .attr("fill", d => d3.interpolateGreens(fillScale(d.winsRatio)))
     .transition()
-    .duration(2000)
+    .duration(1000)
     .attr("width",d => xScaleW(d.wins));
 
     
@@ -133,7 +133,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("height", yScaleL.bandwidth())
     .attr("fill", d => d3.interpolateReds(fillScale(d.lossesRatio)))
     .transition()
-    .duration(2000)
+    .duration(1000)
     .attr("width",d => xScaleL(d.losses));
     
     // Update the axis with the new data points
@@ -149,7 +149,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
       .on("mouseout", handleMouseOutBarChart)
   }
 
-  function updateParallelCoordinates(data) {
+function updateParallelCoordinates(data) {
     const deselectedColor = "rgb(221, 221, 221)";
     const brushWidth = 50;
 
@@ -233,7 +233,6 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
         const isActive = d3.select(this).style("stroke") !== deselectedColor;
         return isActive ? colorScale(d.season) : deselectedColor;
       })
-      //.style("stroke", function (d) { return (colorScale(d.season)) })
       .style("opacity", 0.5)
       .on("mouseover", function (event, d) {
         const isActive = d3.select(this).style("stroke") !== deselectedColor;
@@ -242,7 +241,6 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
         }
       })
       .on("mouseleave", hideTooltip);
-  
 
       const dimensionMapping = {
         "fg_percentage": "Field-goal %",
