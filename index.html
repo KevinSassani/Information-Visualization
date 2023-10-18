@@ -14,7 +14,7 @@
                 height: 100vh;
                 display: grid;
                 grid-template-columns: 60% 40%;
-                grid-template-rows: auto 32% 32% 31%;
+                grid-template-rows: auto 31% 31% 31%;
                 grid-template-areas: 
                     "header header"
                     "parallelsect barsect"
@@ -26,10 +26,22 @@
                 background-color: #d4b26e;
                 color: #fff;
                 text-align: center;
-                display: flex;
                 align-items: center;
-                padding-left: 10px;
+                display: grid;
+                grid-template-columns: 60% 40%;
+                grid-template-rows: 100%;
+                grid-template-areas: "season team";
             }
+            #seasonSlider {
+                grid-area: season;
+                align-items: center;
+
+            }
+            #teamMenu {
+                grid-area: team;
+                margin-left: 220px;
+            }
+
             .visualization {
                 padding-top: 10px;
                 padding-bottom: 10px;

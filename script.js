@@ -130,12 +130,59 @@ function startDashboard() {
 
 
     // Call functions to create the plots
+    createSeasonSlider();
     createParallelCoordinates(); //Define width inside this function
     createDensityPlot(); //Define width inside this function
     createBarCharts();
   })
 
-  };
+};
+
+function createSeasonSlider() {
+
+  // Get the container div element
+  const containerDiv = document.getElementById("seasonSlider");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const height = containerDiv.getBoundingClientRect().height+70;
+
+  // Define your seasons as numeric values
+  const seasons = [2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002];
+
+  // Create a function to convert numeric season values to their original format
+  function formatSeason(season) {
+    return `${season}-${(season + 1).toString().slice(2)}`;
+  }
+
+  // Create the season slider
+  const sliderRange = d3
+    .sliderBottom()
+    .min(d3.min(seasons))
+    .max(d3.max(seasons))
+    .width(900)
+    .tickFormat(formatSeason) // Use the function to format ticks
+    .ticks(20)
+    .default([d3.min(seasons), d3.max(seasons)]);
+
+  // Append the slider to the HTML element with id="seasonSlider"
+  d3.select('#seasonSlider')
+    .append('svg')
+    .attr('width', 1000) // Adjust the width as needed
+    .attr('height', height) // Adjust the height as needed
+    .append('g')
+    .attr('transform', 'translate(30,30)') // Adjust the position as needed
+    .call(sliderRange);
+
+  // Listen to slider changes
+  sliderRange.on('onchange', (value) => {
+    // 'value' is an array representing the selected range of seasons
+    // Update your visualization based on the selected seasons
+    // You can access the selected seasons with 'value[0]' and 'value[1]'
+    console.log('Selected seasons:', value);
+  });
+
+}
+
 
 function createBarCharts(){
 
