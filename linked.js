@@ -26,6 +26,7 @@ const selections = new Map();
  
 function brushed({ selection }, key, data) {
   const deselectedColor = "rgb(221, 221, 221)";
+  const startColor = "rgb(0, 104, 71)";
   const brushWidth = 50;
 
   // Color scale: different colors for each season
@@ -108,7 +109,7 @@ function brushed({ selection }, key, data) {
 
     // Update the line's appearance based on the 'active' flag
     d3.select(this)
-      .style("stroke", active ? colorScale(d.season) : deselectedColor);
+      .style("stroke", active ? startColor : deselectedColor);
 
     if (active) {
       d3.select(this).raise();

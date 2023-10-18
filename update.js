@@ -151,6 +151,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
 
   function updateParallelCoordinates(data) {
     const deselectedColor = "rgb(221, 221, 221)";
+    const startColor = "rgb(0, 104, 71)";
     const brushWidth = 50;
 
     // Get the container div element
@@ -231,17 +232,11 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
       .style("fill", "none")
       .style("stroke", function (d) {
         const isActive = d3.select(this).style("stroke") !== deselectedColor;
-        return isActive ? colorScale(d.season) : deselectedColor;
+        return isActive ? startColor : deselectedColor;
       })
       //.style("stroke", function (d) { return (colorScale(d.season)) })
-      .style("opacity", 0.5)
-      .on("mouseover", function (event, d) {
-        const isActive = d3.select(this).style("stroke") !== deselectedColor;
-        if (isActive) {
-          showTooltip(event, d);
-        }
-      })
-      .on("mouseleave", hideTooltip);
+      .style("opacity", 0.5);
+      
   
 
       const dimensionMapping = {
@@ -253,28 +248,49 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
         "stl": "Steal",
         "blk": "Block"
       };
-    
-    function mapDimensionToTickValue(dimension) {
+  
+    // Draw the axis:
+    function mapDimensionToAxisLabelValue(dimension) {
       return dimensionMapping[dimension] || dimension;
     }
     
-  
     // Draw the axis:
-    d3.selectAll(".axis")
-      // For each dimension of the dataset I add a 'g' element:
-      .data(dimensions)
-      .join()
-      .attr("class", "axis")
-      // I translate this element to its right position on the x axis
-      .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
-      // And I build the axis with the call function
-      .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
+    svg.selectAll("myAxis")
+    // For each dimension of the dataset I add a 'g' element:
+    .data(dimensions).enter()
+    .append("g")
+    .attr("class", "axis")
+    // I translate this element to its right position on the x axis
+    .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+    .on("mouseover", showTooltipParallel)
+    .on("mousemove", showTooltipParallel)
+    .on("mouseleave", hideTooltip)
+    // And I build the axis with the call function
+    .each(function(d) {
+      // Calculate the min and max values for the current dimension
+      var minVal = d3.min(originalData, p => +p[d]);
+      var maxVal = d3.max(originalData, p => +p[d]);
+  
+      // Create a scale for the current axis
+      var axisScale = d3.scaleLinear()
+        .domain([minVal, maxVal])
+        .range([height, 0]);
+  
+      // Create the axis with only the min and max ticks
+      var axis = d3.axisLeft().scale(yScale[d]).tickValues([minVal, maxVal]);
+  
+      d3.select(this).call(axis);
+  
       // Add axis title
-      .append("text")
+      d3.select(this)
+        .append("text")
         .style("text-anchor", "middle")
         .attr("y", -9)
-        .text((d) => mapDimensionToTickValue(d))
-        .style("fill", "black");
+        .text((d) => mapDimensionToAxisLabelValue(d))
+        .style("fill", "black")
+        .style("font-family", "Nunito, sans-serif")
+        .style("font-size", "12px");
+    });
         
 
     // Create the brush behavior along the y-axis.

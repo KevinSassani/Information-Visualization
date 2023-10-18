@@ -335,6 +335,7 @@ function createParallelCoordinates() {
 
   //const width = 600; // - margin.left - margin.right;
   const deselectedColor = "rgb(221, 221, 221)";
+  const startColor = "rgb(0, 104, 71)";
   const brushWidth = 50;
 
   // Get the container div element
@@ -433,18 +434,8 @@ function createParallelCoordinates() {
       .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
       .attr("d",  (d) => path(d))
       .style("fill", "none" )
-      .style("stroke", function(d){ return( colorScale(d.season))} )
-      .style("opacity", 0.5)
-      .on("mouseover", function(event,d) {
-        // Check if the line is active (matches all selections)
-        const isActive = d3.select(this).style("stroke") !== deselectedColor;
-        
-        // Show the tooltip only if the line is active
-        if (isActive) {
-          showTooltip(event, d);
-        }
-      })
-      .on("mouseleave", hideTooltip )
+      .style("stroke", startColor)//function(d){ return( colorScale(d.season))} )
+      .style("opacity", 0.5);
 
     const dimensionMapping = {
       "fg_percentage": "Field-goal %",
@@ -456,29 +447,57 @@ function createParallelCoordinates() {
       "blk": "Block"
     };
   
-  function mapDimensionToTickValue(dimension) {
+  function mapDimensionToAxisLabelValue(dimension) {
     return dimensionMapping[dimension] || dimension;
   }
   
-
   // Draw the axis:
   svg.selectAll("myAxis")
-    // For each dimension of the dataset I add a 'g' element:
-    .data(dimensions).enter()
-    .append("g")
-    .attr("class", "axis")
-    // I translate this element to its right position on the x axis
-    .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
-    // And I build the axis with the call function
-    .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
-    // Add axis title
-    .append("text")
-      .style("text-anchor", "middle")
-      .attr("y", -9)
-      .text((d) => mapDimensionToTickValue(d))
-      .style("fill", "black")
-      .style("font-family", "Nunito, sans-serif");
+  // For each dimension of the dataset I add a 'g' element:
+  .data(dimensions).enter()
+  .append("g")
+  .attr("class", "axis")
+  // I translate this element to its right position on the x axis
+  .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+  .on("mouseover", showTooltipParallel)
+  .on("mousemove", showTooltipParallel)
+  .on("mouseleave", hideTooltip)
+  // And I build the axis with the call function
+  .each(function(d) {
+    // Calculate the min and max values for the current dimension
+    var minVal = d3.min(originalData, p => +p[d]);
+    var maxVal = d3.max(originalData, p => +p[d]);
 
+    // Create a scale for the current axis
+    var axisScale = d3.scaleLinear()
+      .domain([minVal, maxVal])
+      .range([height, 0]);
+
+    // Create the axis with only the min and max ticks
+    var axis = d3.axisLeft().scale(yScale[d]).tickValues([minVal, maxVal]);
+
+    d3.select(this).call(axis)
+      
+  });
+
+  // Create a group for the axis labels
+  svg.append("g")
+  .selectAll("text")
+  .data(dimensions)
+  .enter()
+  .append("text")
+  .attr("class", "axis-label")
+  .attr("x", function (d) {
+    return xScale(d);
+  })
+  .attr("y", -9)
+  .style("text-anchor", "middle")
+  .text(function (d) {
+    return mapDimensionToAxisLabelValue(d);
+  })
+  .style("fill", "black")
+  .style("font-family", "Nunito, sans-serif")
+  .style("font-size", "12px");
 
   
 /*
@@ -517,11 +536,32 @@ function createParallelCoordinates() {
      d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
    });
 
-/*
-  const axes = svg.selectAll(".axis");
-  axes.call(brush);
-  */
  
+}
+
+function showTooltipParallel(event, dimension) {
+  // Get the mouse position
+  const [x, y] = [event.pageX, event.pageY];
+
+  // Invert the y-coordinate to find the corresponding axis value
+  const axisValue = yScale[dimension].invert(y - margin.top - margin.bottom - 18);
+
+  let tooltip = d3.select("#tooltip");
+  // Set the tooltip text and position
+  tooltip
+    .text(`${axisValue.toFixed(2)}`) // Format the axis value as needed
+    .style("left", x + "px")
+    .style("top", (y - 30) + "px")
+    .style("font-family", "Nunito, sans-serif"); // Adjust the vertical position of the tooltip
+
+  // Show the tooltip
+  tooltip.style("opacity", 1);
+}
+
+// Function to hide the tooltip
+function hideTooltip() {
+  // Hide the tooltip
+  d3.select("#tooltip").transition().duration(150).style("opacity", 0);
 }
 
 function createDensityPlot() {
@@ -706,30 +746,7 @@ function createDensityPlot() {
     }
 
   }
- // Function to show tooltip
- function showTooltip(event, d) {
-
-  season = d.season
-
-  // Create or select the tooltip element
-  let tooltip = d3.select("#tooltip");
-
-  // Show the tooltip
-  tooltip.transition().duration(10).style("opacity", 0.9);
-
-  // Position the tooltip at the cursor
-  tooltip.style("left", (event.pageX + 10) + "px")
-    .style("top", (event.pageY - 20) + "px");
-
-  // Set the tooltip text
-  tooltip.text(`Season: ${season}\nOpponent: ${d.opp}`);
-}
-
-// Function to hide the tooltip
-function hideTooltip() {
-  // Hide the tooltip
-  d3.select("#tooltip").transition().duration(800).style("opacity", 0);
-}
+ 
 
 
 
