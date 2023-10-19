@@ -147,7 +147,7 @@ function createSeasonSlider() {
   const height = containerDiv.getBoundingClientRect().height+70;
 
   // Define your seasons as numeric values
-  const seasons = [2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002];
+  const seasons = [2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002];
 
   // Create a function to convert numeric season values to their original format
   function formatSeason(season) {
@@ -182,7 +182,24 @@ function createSeasonSlider() {
     // 'value' is an array representing the selected range of seasons
     // Update your visualization based on the selected seasons
     // You can access the selected seasons with 'value[0]' and 'value[1]'
-    console.log('Selected seasons:', value);
+
+    const lowSeason = formatSeason(value[0]);
+    const highSeason = formatSeason(value[1]);
+    console.log("Selected seasons: "+lowSeason+" til' "+highSeason);
+
+    // To remeber the data that has already been filtered
+    var currentData_temp = currentData;
+
+    // Filter based on the seasonSlider
+    currentData = originalData.filter((d) => {
+      return (d.season >= lowSeason && d.season <= highSeason);
+    });
+
+    // Only include data that matches the other applied filters
+    currentData = currentData.filter((d) => {
+      return currentData_temp.some((tempRow) => tempRow.id === d.id);
+    });
+
   });
 
 }
