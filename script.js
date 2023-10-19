@@ -187,11 +187,9 @@ function createSeasonSlider() {
     const highSeason = formatSeason(value[1]);
     console.log("Selected seasons: "+lowSeason+" til' "+highSeason);
 
-    // To remeber the data that has already been filtered
-    var currentData_temp = currentData;
 
     // Filter based on the seasonSlider
-    currentData = originalData.filter((d) => {
+    currentData_seasonSlider = originalData.filter((d) => {
       return (d.season >= lowSeason && d.season <= highSeason);
     });
 
@@ -203,8 +201,8 @@ function createSeasonSlider() {
     //});
 
     // Call update functions
-    updateBarChart(currentData);
-    updateParallelCoordinates(currentData);
+    updateBarChart(currentData_seasonSlider);
+    updateParallelCoordinates(currentData_seasonSlider);
 
   });
 
