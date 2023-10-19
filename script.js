@@ -3,6 +3,9 @@
 // Define a global variable to store the loaded CSV data
 var originalData;
 var currentData;
+var currentData_parallelCoordinates;
+var currentData_barCharts;
+var currentData_seasonSlider;
 // Create an object to store your scales
 const yScale = {};
 const codeToName = {"ATL" : "Atlanta Hawks",
@@ -115,7 +118,12 @@ function startDashboard() {
   
   importFiles('GamesData.csv').then(function (results) {
     originalData = results[0];
+
+    // Initialization of the current data sets
     currentData = originalData;
+    currentData_parallelCoordinates = originalData;
+    currentData_barCharts = originalData;
+    currentData_seasonSlider = originalData;
 
     /*
     // Convert incomeperperson and alcconsumption data to numbers
@@ -410,7 +418,10 @@ function teamChange(team){
   }else{
     selectedTeams.add(team)
   }
-  currentData = originalData.filter((d) => {return selectedTeams.has(d.opp)})
+  currentData_barCharts = originalData.filter((d) => {return selectedTeams.has(d.opp)})
+
+  currentData = aggregateFilteredData();
+
   selectAllTeams = false
   document.getElementById("selectAll").checked = false
   updateBarChart(currentData)
@@ -421,7 +432,7 @@ function teamChange(team){
 function selectAll(){
   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
   if(!selectAllTeams){
-    currentData = originalData
+    currentData_barCharts = originalData
     Object.keys(codeToName).forEach(element => {
       selectedTeams.add(element)
     });
@@ -430,13 +441,16 @@ function selectAll(){
     }
     selectAllTeams = true
   }else{
-    currentData = []
+    currentData_barCharts = []
     selectedTeams.clear()
     for (let j = 0; j < checkboxes.length; j++) {
       checkboxes[j].checked = false;
     }
     selectAllTeams = false
   }
+
+  currentData = aggregateFilteredData();
+
   updateBarChart(currentData)
   updateParallelCoordinates(currentData)
 }
