@@ -26,6 +26,7 @@ const selections = new Map();
  
 function brushed({ selection }, key, data) {
   const deselectedColor = "rgb(221, 221, 221)";
+  const startColor = "rgb(0, 104, 71)";
   const brushWidth = 50;
 
   // Color scale: different colors for each season
@@ -101,30 +102,32 @@ function brushed({ selection }, key, data) {
       max = +max
       
       if (!(value >= min && value <= max)) {
-        active = false; // Set 'active' to false if any selection matches
+        active = false; // Set 'active' to false if one selection does not match
       } 
     
     });
 
     // Update the line's appearance based on the 'active' flag
     d3.select(this)
-      .style("stroke", active ? colorScale(d.season) : deselectedColor);
+      .style("stroke", active ? startColor : deselectedColor);
 
     if (active) {
       d3.select(this).raise();
       selected.push(d);
     }
     d3.selectAll(".brush").raise();
-    d3.select("#parallelCoordinates").selectAll(".axis").raise();
+    d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
   });
     
-    currentData = data.filter((d) => {return selected.includes(d)});   
+    
+    currentData_parallelCoordinates = originalData.filter((d) => {return selected.includes(d)});   
 
     // Dispatch an event with the selected data
     d3.select("#parallelCoordinates").property("value", selected).dispatch("input");
 
-    // Update other plots
-    updateBarChart(currentData);
+    // Update plots
+    updateBarChart(currentData_parallelCoordinates);
+    // updateParallelCoordinates(currentData_parallelCoordinates)
 }
 
 function createYScale(data, dimensions) {

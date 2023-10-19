@@ -1,3 +1,4 @@
+
 // Global data variable
 // Define a global variable to store the loaded CSV data
 var originalData;
@@ -144,12 +145,83 @@ function startDashboard() {
 
 
     // Call functions to create the plots
+    createSeasonSlider();
     createParallelCoordinates(); //Define width inside this function
-    // createDensityPlot(); //Define width inside this function
+    createDensityPlot(); //Define width inside this function
     createBarCharts();
   })
 
-  };
+};
+
+function createSeasonSlider() {
+
+  // Get the container div element
+  const containerDiv = document.getElementById("seasonSlider");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const height = containerDiv.getBoundingClientRect().height+70;
+
+  // Define your seasons as numeric values
+  const seasons = [2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002];
+
+  // Create a function to convert numeric season values to their original format
+  function formatSeason(season) {
+    return `${season}-${(season + 1).toString().slice(2)}`;
+  }
+
+  // Create the season slider
+  const sliderRange = d3
+    .sliderBottom()
+    .min(d3.min(seasons))
+    .max(d3.max(seasons))
+    .width(900)
+    .tickFormat(formatSeason) // Use the function to format ticks
+    .ticks(20)
+    .step(1)
+    .default([d3.min(seasons), d3.max(seasons)]);
+    
+
+  // Append the slider to the HTML element with id="seasonSlider"
+  d3.select('#seasonSlider')
+    .append('svg')
+    .attr('width', 1000) // Adjust the width as needed
+    .attr('height', height) // Adjust the height as needed
+    .attr("class", "seasonSliderStylingClass")
+    .append('g')
+    .attr('transform', 'translate(30,30)') // Adjust the position as needed
+    .call(sliderRange);
+    
+
+  // Listen to slider changes
+  sliderRange.on('onchange', (value) => {
+    // 'value' is an array representing the selected range of seasons
+    // Update your visualization based on the selected seasons
+    // You can access the selected seasons with 'value[0]' and 'value[1]'
+
+    const lowSeason = formatSeason(value[0]);
+    const highSeason = formatSeason(value[1]);
+    console.log("Selected seasons: "+lowSeason+" til' "+highSeason);
+
+
+    // Filter based on the seasonSlider
+    currentData_seasonSlider = originalData.filter((d) => {
+      return (d.season >= lowSeason && d.season <= highSeason);
+    });
+
+
+    // WILL NOT WORK AS INTENDED!!!!
+    // Only include data that matches the other applied filters
+    //currentData = currentData.filter((d) => {
+    //  return currentData_temp.some((tempRow) => tempRow.id === d.id);
+    //});
+
+    // Call update functions
+    updateBarChart(currentData_seasonSlider);
+    updateParallelCoordinates(currentData_seasonSlider);
+
+  });
+
+}
 
 function createBarCharts(){
 
@@ -368,11 +440,12 @@ function selectAll(){
   updateBarChart(currentData)
   updateParallelCoordinates(currentData)
 }
-  
+
 function createParallelCoordinates() {
 
   //const width = 600; // - margin.left - margin.right;
   const deselectedColor = "rgb(221, 221, 221)";
+  const startColor = "rgb(0, 104, 71)";
   const brushWidth = 50;
 
   // Get the container div element
@@ -467,23 +540,12 @@ function createParallelCoordinates() {
   // Draw the lines
   svg.selectAll("path")
     .data(originalData)
-    .enter()
-    .append("path")
+    .join("path")
       .attr("class", function (d) { return "line season-" + d.season } ) // 2 class for each line: 'line' and the group name
       .attr("d",  (d) => path(d))
       .style("fill", "none" )
-      .style("stroke", function(d){ return( colorScale(d.season))} )
-      .style("opacity", 0.5)
-      .on("mouseover", function(event,d) {
-        // Check if the line is active (matches all selections)
-        const isActive = d3.select(this).style("stroke") !== deselectedColor;
-        
-        // Show the tooltip only if the line is active
-        if (isActive) {
-          showTooltip(event, d);
-        }
-      })
-      .on("mouseleave", hideTooltip )
+      .style("stroke", startColor)//function(d){ return( colorScale(d.season))} )
+      .style("opacity", 0.5);
 
     const dimensionMapping = {
       "fg_percentage": "Field-goal %",
@@ -495,29 +557,57 @@ function createParallelCoordinates() {
       "blk": "Block"
     };
   
-  function mapDimensionToTickValue(dimension) {
+  function mapDimensionToAxisLabelValue(dimension) {
     return dimensionMapping[dimension] || dimension;
   }
   
-
   // Draw the axis:
   svg.selectAll("myAxis")
-    // For each dimension of the dataset I add a 'g' element:
-    .data(dimensions).enter()
-    .append("g")
-    .attr("class", "axis")
-    // I translate this element to its right position on the x axis
-    .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
-    // And I build the axis with the call function
-    .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(5).scale(yScale[d])); })
-    // Add axis title
-    .append("text")
-      .style("text-anchor", "middle")
-      .attr("y", -9)
-      .text((d) => mapDimensionToTickValue(d))
-      .style("fill", "black")
-      .style("font-family", "Nunito, sans-serif");
+  // For each dimension of the dataset I add a 'g' element:
+  .data(dimensions).enter()
+  .append("g")
+  .attr("class", "axisParallel")
+  // I translate this element to its right position on the x axis
+  .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+  .on("mouseover", showTooltipParallel)
+  .on("mousemove", showTooltipParallel)
+  .on("mouseleave", hideTooltip)
+  // And I build the axis with the call function
+  .each(function(d) {
+    // Calculate the min and max values for the current dimension
+    var minVal = d3.min(originalData, p => +p[d]);
+    var maxVal = d3.max(originalData, p => +p[d]);
 
+    // Create a scale for the current axis
+    var axisScale = d3.scaleLinear()
+      .domain([minVal, maxVal])
+      .range([height, 0]);
+
+    // Create the axis with only the min and max ticks
+    var axis = d3.axisLeft().scale(yScale[d]).tickValues([minVal, maxVal]);
+
+    d3.select(this).call(axis)
+      
+  });
+
+  // Create a group for the axis labels
+  svg.append("g")
+  .selectAll("text")
+  .data(dimensions)
+  .enter()
+  .append("text")
+  .attr("class", "axis-label")
+  .attr("x", function (d) {
+    return xScale(d);
+  })
+  .attr("y", -9)
+  .style("text-anchor", "middle")
+  .text(function (d) {
+    return mapDimensionToAxisLabelValue(d);
+  })
+  .style("fill", "black")
+  .style("font-family", "Nunito, sans-serif")
+  .style("font-size", "12px");
 
   
 /*
@@ -551,16 +641,37 @@ function createParallelCoordinates() {
    });
    
    // Attach the brushes to the axes
-   const axes = svg.selectAll(".axis");
+   const axes = svg.selectAll(".axisParallel");
    axes.each(function (d, i) {
      d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
    });
 
-/*
-  const axes = svg.selectAll(".axis");
-  axes.call(brush);
-  */
  
+}
+
+function showTooltipParallel(event, dimension) {
+  // Get the mouse position
+  const [x, y] = [event.pageX, event.pageY];
+
+  // Invert the y-coordinate to find the corresponding axis value
+  const axisValue = yScale[dimension].invert(y - margin.top - margin.bottom - 18);
+
+  let tooltip = d3.select("#tooltip");
+  // Set the tooltip text and position
+  tooltip
+    .text(`${axisValue.toFixed(2)}`) // Format the axis value as needed
+    .style("left", x + "px")
+    .style("top", (y - 30) + "px")
+    .style("font-family", "Nunito, sans-serif"); // Adjust the vertical position of the tooltip
+
+  // Show the tooltip
+  tooltip.style("opacity", 1);
+}
+
+// Function to hide the tooltip
+function hideTooltip() {
+  // Hide the tooltip
+  d3.select("#tooltip").transition().duration(150).style("opacity", 0);
 }
 
 function createDensityPlot() {
@@ -587,11 +698,11 @@ function createDensityPlot() {
     var sliderSvg = sliderContainer.append("svg")
       //.attr("id", "slider")
       .attr("width", "100%")
-      .attr("height", "100%");;
+      .attr("height", "100%");
     
   
     const sliderRange = d3
-      .sliderVertical()
+      .sliderLeft()
       .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
       .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
       .height(sliderHeight)
@@ -736,96 +847,12 @@ function createDensityPlot() {
         );
   
       // Add legend
-      svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", 6).style("fill", dataField === 'tm' ? "#69b3a2" : "#404080");
-      svg.append("text").attr("x", 320).attr("y", 30).text(dataField).style("font-size", "15px").attr("alignment-baseline", "middle");
+      svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", 6).style("fill", "#69b3a2");
+      svg.append("text").attr("x", 320).attr("y", 30).text("Boston Celtics score").style("font-size", "15px").attr("alignment-baseline", "middle");
 
-  
+      svg.append("circle").attr("cx", 300).attr("cy", 50).attr("r", 6).style("fill", "#404080");
+      svg.append("text").attr("x", 320).attr("y", 50).text("Opponent score").style("font-size", "15px").attr("alignment-baseline", "middle");
 
     }
 
   }
-
- // Function to show tooltip
- function showTooltip(event, d) {
-
-  season = d.season
-
-  // Create or select the tooltip element
-  let tooltip = d3.select("#tooltip");
-
-  // Show the tooltip
-  tooltip.transition().duration(10).style("opacity", 0.9);
-
-  // Position the tooltip at the cursor
-  tooltip.style("left", (event.pageX + 10) + "px")
-    .style("top", (event.pageY - 20) + "px");
-
-  // Set the tooltip text
-  tooltip.text(`Season: ${season}\nOpponent: ${d.opp}`);
-}
-
-// Function to hide the tooltip
-function hideTooltip() {
-  // Hide the tooltip
-  d3.select("#tooltip").transition().duration(800).style("opacity", 0);
-}
-
-
-
-
-function getHueScaleColors(count, startHue, endHue) {
-  const colors = [];
-
-  for (let i = 0; i < count; i++) {
-    // Generate hue within the specified range
-    const hue = startHue + ((endHue - startHue) * (i / count));
-
-    // Set constant saturation and value
-    const saturation = 90;
-    const value = 90;
-
-    // Convert HSV to RGB
-    const chroma = (value / 100) * (saturation / 100);
-    const x = chroma * (1 - Math.abs(((hue / 60) % 2) - 1));
-    const m = value / 100 - chroma;
-
-    let r, g, b;
-    if (hue >= 0 && hue < 60) {
-      r = chroma;
-      g = x;
-      b = 0;
-    } else if (hue >= 60 && hue < 120) {
-      r = x;
-      g = chroma;
-      b = 0;
-    } else if (hue >= 120 && hue < 180) {
-      r = 0;
-      g = chroma;
-      b = x;
-    } else if (hue >= 180 && hue < 240) {
-      r = 0;
-      g = x;
-      b = chroma;
-    } else if (hue >= 240 && hue < 300) {
-      r = x;
-      g = 0;
-      b = chroma;
-    } else {
-      r = chroma;
-      g = 0;
-      b = x;
-    }
-
-    // Convert RGB values to integers
-    const red = Math.floor((r + m) * 255);
-    const green = Math.floor((g + m) * 255);
-    const blue = Math.floor((b + m) * 255);
-
-    // Create an RGB color string
-    const color = `rgb(${red},${green},${blue}`;
-
-    colors.push(color);
-  }
-
-  return colors;
-}
