@@ -140,6 +140,8 @@ function startDashboard() {
 
 function createSeasonSlider() {
 
+  const initialColor = "#000000";
+  const highlightColor = "#00621E"
   // Get the container div element
   const containerDiv = document.getElementById("seasonSlider");
 
@@ -162,16 +164,20 @@ function createSeasonSlider() {
     .width(900)
     .tickFormat(formatSeason) // Use the function to format ticks
     .ticks(20)
+    .step(1)
     .default([d3.min(seasons), d3.max(seasons)]);
+    
 
   // Append the slider to the HTML element with id="seasonSlider"
   d3.select('#seasonSlider')
     .append('svg')
     .attr('width', 1000) // Adjust the width as needed
     .attr('height', height) // Adjust the height as needed
+    .attr("class", "seasonSliderStylingClass")
     .append('g')
     .attr('transform', 'translate(30,30)') // Adjust the position as needed
     .call(sliderRange);
+    
 
   // Listen to slider changes
   sliderRange.on('onchange', (value) => {
@@ -503,7 +509,7 @@ function createParallelCoordinates() {
   // For each dimension of the dataset I add a 'g' element:
   .data(dimensions).enter()
   .append("g")
-  .attr("class", "axis")
+  .attr("class", "axisParallel")
   // I translate this element to its right position on the x axis
   .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
   .on("mouseover", showTooltipParallel)
@@ -578,7 +584,7 @@ function createParallelCoordinates() {
    });
    
    // Attach the brushes to the axes
-   const axes = svg.selectAll(".axis");
+   const axes = svg.selectAll(".axisParallel");
    axes.each(function (d, i) {
      d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
    });
@@ -635,11 +641,11 @@ function createDensityPlot() {
     var sliderSvg = sliderContainer.append("svg")
       //.attr("id", "slider")
       .attr("width", "100%")
-      .attr("height", "100%");;
+      .attr("height", "100%");
     
   
     const sliderRange = d3
-      .sliderVertical()
+      .sliderLeft()
       .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
       .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
       .height(sliderHeight)

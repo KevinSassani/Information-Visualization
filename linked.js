@@ -116,7 +116,7 @@ function brushed({ selection }, key, data) {
       selected.push(d);
     }
     d3.selectAll(".brush").raise();
-    d3.select("#parallelCoordinates").selectAll(".axis").raise();
+    d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
   });
     
     currentData = data.filter((d) => {return selected.includes(d)});   

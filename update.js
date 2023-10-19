@@ -259,7 +259,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     // For each dimension of the dataset I add a 'g' element:
     .data(dimensions).enter()
     .append("g")
-    .attr("class", "axis")
+    .attr("class", "axisParallel")
     // I translate this element to its right position on the x axis
     .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
     .on("mouseover", showTooltipParallel)
@@ -311,7 +311,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
    });
    
    // Attach the brushes to the axes
-   const axes = d3.select("#parallelCoordinates").selectAll(".axis");
+   const axes = d3.select("#parallelCoordinates").selectAll(".axisParallel");
    axes.each(function (d, i) {
      d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
    });
