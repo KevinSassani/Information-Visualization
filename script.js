@@ -140,8 +140,6 @@ function startDashboard() {
 
 function createSeasonSlider() {
 
-  const initialColor = "#000000";
-  const highlightColor = "#00621E"
   // Get the container div element
   const containerDiv = document.getElementById("seasonSlider");
 
