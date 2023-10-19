@@ -195,10 +195,16 @@ function createSeasonSlider() {
       return (d.season >= lowSeason && d.season <= highSeason);
     });
 
+
+    // WILL NOT WORK AS INTENDED!!!!
     // Only include data that matches the other applied filters
-    currentData = currentData.filter((d) => {
-      return currentData_temp.some((tempRow) => tempRow.id === d.id);
-    });
+    //currentData = currentData.filter((d) => {
+    //  return currentData_temp.some((tempRow) => tempRow.id === d.id);
+    //});
+
+    // Call update functions
+    updateBarChart(currentData);
+    updateParallelCoordinates(currentData);
 
   });
 
@@ -815,65 +821,5 @@ function createDensityPlot() {
 
   }
  
-
-
-
-
-function getHueScaleColors(count, startHue, endHue) {
-  const colors = [];
-
-  for (let i = 0; i < count; i++) {
-    // Generate hue within the specified range
-    const hue = startHue + ((endHue - startHue) * (i / count));
-
-    // Set constant saturation and value
-    const saturation = 90;
-    const value = 90;
-
-    // Convert HSV to RGB
-    const chroma = (value / 100) * (saturation / 100);
-    const x = chroma * (1 - Math.abs(((hue / 60) % 2) - 1));
-    const m = value / 100 - chroma;
-
-    let r, g, b;
-    if (hue >= 0 && hue < 60) {
-      r = chroma;
-      g = x;
-      b = 0;
-    } else if (hue >= 60 && hue < 120) {
-      r = x;
-      g = chroma;
-      b = 0;
-    } else if (hue >= 120 && hue < 180) {
-      r = 0;
-      g = chroma;
-      b = x;
-    } else if (hue >= 180 && hue < 240) {
-      r = 0;
-      g = x;
-      b = chroma;
-    } else if (hue >= 240 && hue < 300) {
-      r = x;
-      g = 0;
-      b = chroma;
-    } else {
-      r = chroma;
-      g = 0;
-      b = x;
-    }
-
-    // Convert RGB values to integers
-    const red = Math.floor((r + m) * 255);
-    const green = Math.floor((g + m) * 255);
-    const blue = Math.floor((b + m) * 255);
-
-    // Create an RGB color string
-    const color = `rgb(${red},${green},${blue}`;
-
-    colors.push(color);
-  }
-
-  return colors;
-}
 
 

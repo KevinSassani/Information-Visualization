@@ -149,7 +149,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
       .on("mouseout", handleMouseOutBarChart)
   }
 
-  function updateParallelCoordinates(data) {
+function updateParallelCoordinates(data) {
     const deselectedColor = "rgb(221, 221, 221)";
     const startColor = "rgb(0, 104, 71)";
     const brushWidth = 50;
@@ -290,6 +290,10 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
         .style("fill", "black")
         .style("font-family", "Nunito, sans-serif")
         .style("font-size", "12px");
+
+      d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
+      d3.selectAll(".brush").raise();
+      
     });
         
 

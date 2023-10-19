@@ -102,7 +102,7 @@ function brushed({ selection }, key, data) {
       max = +max
       
       if (!(value >= min && value <= max)) {
-        active = false; // Set 'active' to false if any selection matches
+        active = false; // Set 'active' to false if one selection does not match
       } 
     
     });
@@ -119,13 +119,15 @@ function brushed({ selection }, key, data) {
     d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
   });
     
-    currentData = data.filter((d) => {return selected.includes(d)});   
+    
+    currentData_parallelCoordinates = originalData.filter((d) => {return selected.includes(d)});   
 
     // Dispatch an event with the selected data
     d3.select("#parallelCoordinates").property("value", selected).dispatch("input");
 
-    // Update other plots
-    updateBarChart(currentData);
+    // Update plots
+    updateBarChart(currentData_parallelCoordinates);
+    // updateParallelCoordinates(currentData_parallelCoordinates)
 }
 
 function createYScale(data, dimensions) {
