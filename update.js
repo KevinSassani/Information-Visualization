@@ -69,7 +69,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("height", yScaleW.bandwidth())
     .attr("fill", d => d3.interpolateGreens(fillScale(d.winsRatio)))
     .transition()
-    .duration(2000)
+    .duration(1000)
     .attr("width",d => xScaleW(d.wins));
 
     
@@ -133,7 +133,7 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("height", yScaleL.bandwidth())
     .attr("fill", d => d3.interpolateReds(fillScale(d.lossesRatio)))
     .transition()
-    .duration(2000)
+    .duration(1000)
     .attr("width",d => xScaleL(d.losses));
     
     // Update the axis with the new data points
@@ -236,8 +236,6 @@ function updateParallelCoordinates(data) {
       })
       //.style("stroke", function (d) { return (colorScale(d.season)) })
       .style("opacity", 0.5);
-      
-  
 
       const dimensionMapping = {
         "fg_percentage": "Field-goal %",
