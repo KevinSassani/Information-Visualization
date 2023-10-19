@@ -35,7 +35,6 @@
             #seasonSlider {
                 grid-area: season;
                 align-items: center;
-
             }
             
             /*Season slider styling*/
@@ -96,14 +95,36 @@
                 grid-area: heatmapsect;
                 object-fit: contain;
             }
-
-            #barCharts{
-                text-align: justify;
+            #BarChartsContainer {
                 grid-area: barsect;
+                display: grid;
+                grid-template-columns: 1fr; /* 1 column */
+                grid-template-rows: 6fr 1fr; /* 2 rows, 80% for the first row, 20% for the second row */
+                grid-template-areas: 
+                "barcharts"
+                "legend";
+            }
+            #barCharts{
+                grid-area: barcharts;
+                text-align: justify;
                 object-fit: contain;
             }
+            #barChartLegends{
+                grid-area: legend;
+                display: grid;
+                grid-template-columns: 1f 1fr;
+                grid-template-rows: 1fr;
+                grid-template-areas: 
+                "wins losses";
+            }
+            #winsLegend{
+                grid-area: wins;
+            }
+            #lossesLegend{
+                grid-area: losses;
+            }
             .multiselect {
-            width: 200px;
+            width: 52%;
             }
             .selectBox {
             position: relative;
@@ -123,15 +144,20 @@
             #checkboxes {
             display: none;
             border: 1px #dadada solid;
-            overflow: scroll;
+            /* height: 400px;
+            overflow-y: visible; */
             height: 6vh;
             text-align: left;
+            position: absolute;
+            z-index: 2;
+            background-color: #d4b26e;
             }
 
             #checkboxes label {
             display: block;
             font-size: small;
             color: white;
+            background-color: #d4b26e;
             }
 
             #checkboxes label:hover {
@@ -196,7 +222,13 @@
                     <div class = "slider-container" id="slider-opp_score"></div>
                 </div>
             </div>
-            <div class="visualization" id="barCharts"></div>
+            <div id="BarChartsContainer">
+                <div class="visualization" id="barCharts"></div>
+                <div id="barChartLegends">
+                    <div id="winsLegend"></div>
+                    <div id="lossesLegend"></div>
+                </div>
+            </div>
             <div class="visualization" id="heatMap"><img src="mapofcourtPICTURE.jpg" alt="Map of the Court" class="heatmap-image"></div>
         </div>
     </body>
