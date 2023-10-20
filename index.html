@@ -18,8 +18,7 @@
                 grid-template-areas: 
                     "header header"
                     "parallelsect barsect"
-                    "densitysect barsect"
-                    "heatmapsect barsect";
+                    "densitysect barsect";
             }
             header {
                 grid-area: header;
@@ -65,17 +64,11 @@
                 grid-area: parallelsect;
                 object-fit: contain;
             }
-            #densityPlot {
-                grid-area: densitysect;
-                display: grid;
-                grid-template-rows: auto auto; /* Two rows, one for densityPlotFigure, one for densityPlotSliderContainer */
-                grid-template-areas: "densityPlot_fig" "sliderContainer"; /* Each area in its respective row */
-            }
 
             #densityPlot {
                 grid-area: densitysect;
                 display: grid;
-                grid-template-rows: 80% auto; /* 80% for densityPlotFigure, and auto for the remaining space */
+                grid-template-rows: 70% auto; /* 80% for densityPlotFigure, and auto for the remaining space */
                 grid-template-areas:
                     "densityPlot_fig"
                     "sliderContainer";
@@ -100,11 +93,6 @@
             #slider-opp_score {
                 grid-area: slider_opp;
                 padding-left: 3%;
-            }
-        
-            #heatMap {
-                grid-area: heatmapsect;
-                object-fit: contain;
             }
             #BarChartsContainer {
                 grid-area: barsect;
