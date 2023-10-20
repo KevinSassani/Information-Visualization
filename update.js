@@ -293,3 +293,54 @@ function updateParallelCoordinates(data) {
     axes.call(brush);
     */
 }
+
+function updateParallelCoordinatesHooverBarChart(data) {
+  const deselectedColor = "rgb(221, 221, 221)";
+  const selectedColor = "rgb(0, 178, 243)";
+
+  // Get the container div element
+  const containerDiv = document.getElementById("parallelCoordinates");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
+
+  // Choose dimensions to include in the plot
+  dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
+
+  xScale = d3.scalePoint()
+  .range([0, width])
+  .domain(dimensions);
+
+
+  // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
+  function path(d) {
+    return d3.line()(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+  }
+
+  // Update the lines based on the filtered data
+  d3.selectAll(".line")
+    .data(originalData)
+    .join("path")
+    //.attr("class", function (d) { return "line season-" + d.season })
+    .attr("d", (d) => path(d))
+    .style("fill", "none")
+    .style("stroke", function (d) {
+      const isActive = data.some((dataPoint) => dataPoint.id === d.id);
+      if (isActive) {
+        // Raise only if isActive is true
+        d3.select(this).raise();
+        d3.select(this).style("opacity", 1);
+      } else {
+        d3.select(this).style("opacity", 0.5);
+      }
+      return isActive ? selectedColor : deselectedColor;
+    })
+    //.style("stroke", function (d) { return (colorScale(d.season)) })
+    .style("opacity", 0.5);
+
+    d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
+    d3.selectAll(".brush").raise();
+
+}

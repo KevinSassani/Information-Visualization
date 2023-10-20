@@ -12,12 +12,18 @@ function handleMouseOveBarChart(event, item) {
     .attr("stroke-width","2px")
     .append("title")
     .text(d => `team : ${codeToName[d.name]}\nwins : ${d.wins}, losses : ${d.losses}\nwins ratio : ${d.winsRatio.toFixed(2)}`); // Change the fill color of the matching elements to red
+
+    console.log(item.name)
+    currentData_barChartHoover = originalData.filter((d) => {return item.name == d.opp})
+    updateParallelCoordinatesHooverBarChart(currentData_barChartHoover)
 }
 
 function handleMouseOutBarChart(event, item){
   d3.select("#barCharts")
     .selectAll(".bar")
     .attr("stroke", "none")
+
+  updateParallelCoordinates(aggregateFilteredData())
 }
 
 
@@ -29,9 +35,6 @@ function brushed({ selection }, key, data) {
   const startColor = "rgb(0, 104, 71)";
   const brushWidth = 50;
 
-  /*
-  const yScale = createYScale(data, dimensions);
-  */
 
   if (selection === null) selections.delete(key);
   else selections.set(key, selection.map(yScale[key].invert));
@@ -57,17 +60,8 @@ function brushed({ selection }, key, data) {
     
     });
 
-    /* REMOVE
-    // Update the line's appearance based on the 'active' flag
-    d3.select(this)
-      .style("stroke", active ? startColor : deselectedColor);
-
-      */
 
     if (active) {
-      /* REMOVE
-      d3.select(this).raise();
-      */
       selected.push(d);
     }
   });
@@ -76,9 +70,6 @@ function brushed({ selection }, key, data) {
     currentData_parallelCoordinates = originalData.filter((d) => {return selected.includes(d)});   
 
     currentData = aggregateFilteredData();
-
-    // Dispatch an event with the selected data REMOVE MAYBE
-    //d3.select("#parallelCoordinates").property("value", selected).dispatch("input");
 
     // Update plots
     updateBarChart(currentData);

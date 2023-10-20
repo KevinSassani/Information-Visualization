@@ -125,33 +125,6 @@ function startDashboard() {
     currentData_barCharts = originalData;
     currentData_seasonSlider = originalData;
 
-    /*
-    // Convert incomeperperson and alcconsumption data to numbers
-    originalData.forEach(function (d) {
-      d.tm = +d.tm 
-      d.opp_score = +d.opp_score
-      d.fg = +d.fg
-      d.fga = +d.fga
-      d.fg_percentage = + d.fg_percentage
-      d.three_points = +d.three_points
-      d.three_point_attempts = +d.three_point_attempts
-      d.three_point_percentage = +d.three_point_percentage
-      d.ft = +d.ft
-      d.fta = +d.fta
-      d.free_throw_percentage = +d.free_throw_percentage
-      d.orb = +d.orb
-      d.trb = +d.trb
-      d.ast = +d.ast
-      d.stl = +d.stl
-      d.blk = +d.blk
-      d.tov = +d.tov
-      d.pf = +d.pf
-      d.drb = +d.drb
-      d.two_point_percentage = +d.two_point_percentage
-    });
-    */
-
-
     // Call functions to create the plots
     createSeasonSlider();
     createParallelCoordinates(); //Define width inside this function
@@ -500,21 +473,6 @@ function createParallelCoordinates() {
   var colorScale = d3.scaleOrdinal()
     .domain(["2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11", "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04", "2002-03"])
     .range(customColors);
-    //.range(getHueScaleColors(20, 50, 300));
-
-  /*
-  var colors = d3.scaleSequential()
-  .domain([0, 1]) // Define a dummy domain from 0 to 1
-  .interpolator(d3.interpolateBrBG); // Use the interpolation function
-
-  var domainValues = ["2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11", "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04", "2002-03"];
-
-  var colorScale = d3.scaleOrdinal()
-    .domain(domainValues)
-    .range(domainValues.map(function(value, index, array) {
-      return colors(index / (array.length - 1));
-    }));
-*/
 
   // Choose dimensions to include in the plot
   dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
@@ -617,20 +575,6 @@ function createParallelCoordinates() {
   .style("fill", "black")
   .style("font-family", "Nunito, sans-serif")
   .style("font-size", "12px");
-
-  
-/*
-  const brush = d3.brushY()
-    .extent([
-      [-(brushWidth / 2), 0],
-      [brushWidth / 2, height]
-    ])
-    .on("start brush end", function (event) {
-      console.log(event)
-    });// => brushed(event, key, originalData));
-    //.on("start brush end", brushed);
-    
-    */
  
   // Create the brush behavior along the y-axis.
    const brushes = []; // Create an array to store the brush instances
@@ -654,7 +598,6 @@ function createParallelCoordinates() {
    axes.each(function (d, i) {
      d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
    });
-
  
 }
 
