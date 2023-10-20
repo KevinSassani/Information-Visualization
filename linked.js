@@ -13,9 +13,8 @@ function handleMouseOveBarChart(event, item) {
     .append("title")
     .text(d => `team : ${codeToName[d.name]}\nwins : ${d.wins}, losses : ${d.losses}\nwins ratio : ${d.winsRatio.toFixed(2)}`); // Change the fill color of the matching elements to red
 
-    console.log(item.name)
-    currentData_barChartHoover = originalData.filter((d) => {return item.name == d.opp})
-    updateParallelCoordinatesHooverBarChart(currentData_barChartHoover)
+    currentData_barChartHoover = originalData.filter((d) => {return item.name == d.opp});
+    updateParallelCoordinatesHooverBarChart(aggregateFilteredData());
 }
 
 function handleMouseOutBarChart(event, item){
@@ -23,7 +22,8 @@ function handleMouseOutBarChart(event, item){
     .selectAll(".bar")
     .attr("stroke", "none")
 
-  updateParallelCoordinates(aggregateFilteredData())
+  currentData_barChartHoover = originalData;
+  updateParallelCoordinates(aggregateFilteredData());
 }
 
 
@@ -79,16 +79,18 @@ function brushed({ selection }, key, data) {
 function aggregateFilteredData() {
     // Create a Set for each dataset to store unique data points
     const set_parallel = new Set(currentData_parallelCoordinates.map(d => d.id));
-    const set2_barCharts = new Set(currentData_barCharts.map(d => d.id));
-    const set3_season = new Set(currentData_seasonSlider.map(d => d.id));
+    const set_barCharts = new Set(currentData_barCharts.map(d => d.id));
+    const set_barChartsHoover = new Set(currentData_barChartHoover.map(d => d.id));
+    const set_season = new Set(currentData_seasonSlider.map(d => d.id));
   
     // Find the common data points by intersecting the sets
-    const commonDataPoints = [...set_parallel].filter(id => set2_barCharts.has(id) && set3_season.has(id));
+    const commonDataPoints = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsHoover.has(id));
   
     // Filter the datasets to include only common data points
     const aggregatedDataset = currentData_parallelCoordinates
       .filter(d => commonDataPoints.includes(d.id))
       .concat(currentData_barCharts.filter(d => commonDataPoints.includes(d.id)))
+      .concat(currentData_barChartHoover.filter(d => commonDataPoints.includes(d.id)))
       .concat(currentData_seasonSlider.filter(d => commonDataPoints.includes(d.id)));
   
     return aggregatedDataset;

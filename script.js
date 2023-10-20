@@ -124,6 +124,7 @@ function startDashboard() {
     currentData_parallelCoordinates = originalData;
     currentData_barCharts = originalData;
     currentData_seasonSlider = originalData;
+    currentData_barChartHoover = originalData;
 
     // Call functions to create the plots
     createSeasonSlider();
