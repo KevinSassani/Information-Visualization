@@ -165,58 +165,10 @@ function updateParallelCoordinates(data) {
     // Choose dimensions to include in the plot
     dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
 
-    /*
-    // Create an object to store your scales
-    const yScale = {};
-
-    // For each dimension, build a linear scale
-    dimensions.forEach(function(dimension) {
-      // Get the min and max values for the dimension
-      const min = d3.min(data, d => +d[dimension]);
-      const max = d3.max(data, d => +d[dimension]);
-
-      // Create a linear scale for the dimension
-      const scale = d3.scaleLinear()
-        .domain([min, max])
-        .range([height, 0]); 
-
-      // Store the scale in the yScale
-      yScale[dimension] = scale;
-    });
-    */
-
     xScale = d3.scalePoint()
     .range([0, width])
     .domain(dimensions);
 
-    // Color scale: different colors for each season
-    var customColors = [
-      "#007A33", // Boston Celtics' green
-      "#BA9653", // Custom color 2
-      "#FFFFFF", // White
-      "#000000", // Black
-      "#C8102E", // Another shade of green
-      "#D13870", // Another shade of green
-      "#D6A06F", // A light brownish color
-      "#007-DC3", // Another shade of green
-      "#B7A248", // A yellowish color
-      "#4A90E2", // A blue color
-      "#E03A3E", // A bright red color
-      "#FFA25D", // An orange color
-      "#6C6073", // A dark gray color
-      "#D7C6BB", // A light gray color
-      "#FF5736", // A bright orange color
-      "#00B2A9", // A teal color
-      "#4F0D3E", // A dark purple color
-      "#E2D1C3", // A light peach color
-      "#00A79D", // Another shade of teal
-      "#706962", // A dark olive green color
-      "#FDB927"  // A bright yellow color
-    ];
-
-    var colorScale = d3.scaleOrdinal()
-      .domain(["2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11", "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04", "2002-03"])
-      .range(customColors);
 
     // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
     function path(d) {
@@ -225,18 +177,26 @@ function updateParallelCoordinates(data) {
 
     // Update the lines based on the filtered data
     d3.selectAll(".line")
-      .data(data)
+      .data(originalData)
       .join("path")
-      .attr("class", function (d) { return "line season-" + d.season })
+      //.attr("class", function (d) { return "line season-" + d.season })
       .attr("d", (d) => path(d))
       .style("fill", "none")
       .style("stroke", function (d) {
-        const isActive = d3.select(this).style("stroke") !== deselectedColor;
+        const isActive = data.some((dataPoint) => dataPoint.id === d.id);
+        if (isActive) {
+          // Raise only if isActive is true
+          d3.select(this).raise();
+        }
         return isActive ? startColor : deselectedColor;
       })
       //.style("stroke", function (d) { return (colorScale(d.season)) })
       .style("opacity", 0.5);
 
+      d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
+      d3.selectAll(".brush").raise();
+
+      /*
       const dimensionMapping = {
         "fg_percentage": "Field-goal %",
         "free_throw_percentage": "Free-throw %",
@@ -253,7 +213,7 @@ function updateParallelCoordinates(data) {
     }
     
     // Draw the axis:
-    svg.selectAll("myAxis")
+    d3.select("#parallelCoordinates").selectAll("myAxis")
     // For each dimension of the dataset I add a 'g' element:
     .data(dimensions).enter()
     .append("g")
@@ -297,7 +257,7 @@ function updateParallelCoordinates(data) {
 
     // Create the brush behavior along the y-axis.
    const brushes = []; // Create an array to store the brush instances
-
+/*
    // Create the brushes for each axis
    dimensions.forEach((key) => {
      const brush = d3.brushY()
@@ -317,6 +277,7 @@ function updateParallelCoordinates(data) {
    axes.each(function (d, i) {
      d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
    });
+   */
 /*
     // Create the brush behavior along the y-axis.
     const brush = d3.brushY()
@@ -331,4 +292,55 @@ function updateParallelCoordinates(data) {
     const axes = d3.select("#parallelCoordinates").selectAll(".axis");
     axes.call(brush);
     */
+}
+
+function updateParallelCoordinatesHooverBarChart(data) {
+  const deselectedColor = "rgb(221, 221, 221)";
+  const selectedColor = "rgb(0, 178, 243)";
+
+  // Get the container div element
+  const containerDiv = document.getElementById("parallelCoordinates");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
+
+  // Choose dimensions to include in the plot
+  dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
+
+  xScale = d3.scalePoint()
+  .range([0, width])
+  .domain(dimensions);
+
+
+  // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
+  function path(d) {
+    return d3.line()(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+  }
+
+  // Update the lines based on the filtered data
+  d3.selectAll(".line")
+    .data(originalData)
+    .join("path")
+    //.attr("class", function (d) { return "line season-" + d.season })
+    .attr("d", (d) => path(d))
+    .style("fill", "none")
+    .style("stroke", function (d) {
+      const isActive = data.some((dataPoint) => dataPoint.id === d.id);
+      if (isActive) {
+        // Raise only if isActive is true
+        d3.select(this).raise();
+        d3.select(this).style("opacity", 1);
+      } else {
+        d3.select(this).style("opacity", 0.5);
+      }
+      return isActive ? selectedColor : deselectedColor;
+    })
+    //.style("stroke", function (d) { return (colorScale(d.season)) })
+    .style("opacity", 0.5);
+
+    d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
+    d3.selectAll(".brush").raise();
+
 }
