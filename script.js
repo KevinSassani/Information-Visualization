@@ -55,8 +55,7 @@ const margin = {
 };
 
 // show team checkbox
-var expanded = false;
-function showCheckboxes() {
+function createCheckboxes(){
   var checkboxes = document.getElementById("checkboxes");
   // Select All tick
   const allCheckbox = document.createElement('input');
@@ -88,6 +87,9 @@ function showCheckboxes() {
     // Append the checkbox and label to the container
     checkboxes.appendChild(label);
   });
+}
+var expanded = false;
+function showCheckboxes() {
   // display or hide checkbox
   if (!expanded) {
     checkboxes.style.display = "block";
@@ -146,9 +148,11 @@ function startDashboard() {
 
     // Call functions to create the plots
     createSeasonSlider();
+    createCheckboxes();
     createParallelCoordinates(); //Define width inside this function
     createDensityPlot(); //Define width inside this function
     createBarCharts();
+    createBarChartsLegend();
   })
 
 };
@@ -229,7 +233,7 @@ function createBarCharts(){
   const containerDiv = document.getElementById("barCharts");
 
   // Get the width and height of the container using getBoundingClientRect()
-  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const width = containerDiv.getBoundingClientRect().width - margin.left//- margin.left - margin.right;
   const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
 
   const padding = 30
@@ -247,6 +251,8 @@ function createBarCharts(){
     .attr("height", height)
     .append("g")
     .attr("id", "winsBarChart")
+    .style("z-index",1)
+    .style("position","absolute")
     .attr("transform", `translate(${50 + margin.left},${margin.top})`);
   // Define scales
   const yScaleW = d3.scaleBand()
@@ -361,6 +367,74 @@ function createBarCharts(){
     .attr("y", -margin.left)
     .text("Teams")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
+}
+
+function createBarChartsLegend(){
+  // Get the container div element
+  const containerDiv = document.getElementById("winsLegend");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width //- margin.left
+  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+
+  var legendColors = []; // Values from the color scale
+  for(var i = 0; i <= 1; i=i+0.01){
+    legendColors.push(i)
+  }
+
+  // wins legend svg
+  const lW = d3
+    .select("#winsLegend")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("id", "winsLegendGroup")
+    .attr("transform", `translate(${margin.left + 50},${margin.top})`);
+  lW
+    .selectAll("rect")
+    .data(legendColors)
+    .enter()
+    .append("rect")
+    .attr("x", (d,i) => i * 2)
+    .attr("y", 10)
+    .attr("width", 2)
+    .attr("height", "30px")
+    .attr("fill", d => d3.interpolateGreens(d));
+  lW.append("text")
+    .attr("x", margin.left + 50)
+    .attr("y", 0)
+    .attr("text-anchor", "middle")
+    .text("Wins Ratio")
+    .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("padding", "10") 
+    
+  // losses legend svg
+  const lL = d3
+    .select("#lossesLegend")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("id", "lossesLegendGroup")
+    .attr("transform", `translate(${margin.left + 30},${margin.top})`);
+  lL
+    .selectAll("rect")
+    .data(legendColors)
+    .enter()
+    .append("rect")
+    .attr("x", (d,i) => i * 2)
+    .attr("y", 10)
+    .attr("width", 2)
+    .attr("height", "30px")
+    .attr("fill", d => d3.interpolateReds(d));
+  lL.append("text")
+    .attr("x", margin.left + 50)
+    .attr("y", 0)
+    .attr("text-anchor", "middle")
+    .text("Losses Ratio")
+    .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("padding", "10") 
 }
 
 function winsandlosses(currentData){
