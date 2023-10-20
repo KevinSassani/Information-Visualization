@@ -184,11 +184,19 @@ function updateParallelCoordinates(data) {
       .style("fill", "none")
       .style("stroke", function (d) {
         const isActive = data.some((dataPoint) => dataPoint.id === d.id);
+        if (isActive) {
+          // Raise only if isActive is true
+          d3.select(this).raise();
+        }
         return isActive ? startColor : deselectedColor;
       })
       //.style("stroke", function (d) { return (colorScale(d.season)) })
       .style("opacity", 0.5);
 
+      d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
+      d3.selectAll(".brush").raise();
+
+      /*
       const dimensionMapping = {
         "fg_percentage": "Field-goal %",
         "free_throw_percentage": "Free-throw %",
@@ -270,7 +278,7 @@ function updateParallelCoordinates(data) {
      d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
    });
    */
-
+/*
     // Create the brush behavior along the y-axis.
     const brush = d3.brushY()
       .extent([
@@ -283,5 +291,5 @@ function updateParallelCoordinates(data) {
     // Attach the brush to the axes
     const axes = d3.select("#parallelCoordinates").selectAll(".axis");
     axes.call(brush);
-    
+    */
 }

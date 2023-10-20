@@ -216,16 +216,11 @@ function createSeasonSlider() {
       return (d.season >= lowSeason && d.season <= highSeason);
     });
 
-
-    // WILL NOT WORK AS INTENDED!!!!
-    // Only include data that matches the other applied filters
-    //currentData = currentData.filter((d) => {
-    //  return currentData_temp.some((tempRow) => tempRow.id === d.id);
-    //});
+    currentData = aggregateFilteredData();
 
     // Call update functions
-    updateBarChart(currentData_seasonSlider);
-    updateParallelCoordinates(currentData_seasonSlider);
+    updateBarChart(currentData);
+    updateParallelCoordinates(currentData);
 
   });
 
