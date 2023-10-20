@@ -409,7 +409,7 @@ function createBarChartsLegend(){
     .attr("x", margin.left + 50)
     .attr("y", 0)
     .attr("text-anchor", "middle")
-    .text("Losses Ratio")
+    .text("Loss Ratio")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
     .style("padding", "10") 
 }
