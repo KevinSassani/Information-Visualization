@@ -93,16 +93,41 @@ function createCheckboxes(){
 }
 var expanded = false;
 function showCheckboxes() {
+  var checkboxes = document.getElementById("checkboxes");
   // display or hide checkbox
   if (!expanded) {
     checkboxes.style.display = "block";
     expanded = true;
+    document.getElementById("showhidedbutton").innerText = "Hide"
   } else {
     checkboxes.style.display = "none";
     expanded = false;
+    document.getElementById("showhidedbutton").innerText = "Show"
   }
 }
 
+function highlightTeams(){
+  text = document.getElementById("searchBar").value.toLowerCase()
+  checkboxes = document.querySelectorAll('input[type="checkbox"]')
+  lid = []
+  for(var i=0; i<checkboxes.length; i++){
+    lid.push(checkboxes[i].id)
+  }
+
+  if(text != ""){
+    for(var i=0; i<checkboxes.length; i++){
+      if(checkboxes[i].id.toLowerCase().startsWith(text)){
+        document.getElementById(checkboxes[i].id).parentNode.style.color = "black";
+      }else{
+        document.getElementById(checkboxes[i].id).parentNode.style.color = "white";
+      }
+    }
+  }else{
+    lid.map(id => {
+      document.getElementById(id).parentNode.style.color = "white";
+    })
+  }
+}
 
 const width = (window.screen.width - margin.left - margin.right) / 2;
 const height = (window.screen.height - margin.top - margin.bottom) / 3;

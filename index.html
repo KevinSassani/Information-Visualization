@@ -127,6 +127,9 @@
             }
             .selectBox {
             position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
             }
 
             .selectBox select {
@@ -201,11 +204,9 @@
                 <div id="teamMenu">
                     <form>
                         <div class="multiselect">
-                          <div class="selectBox" onclick="showCheckboxes()">
-                            <select>
-                              <option>Select teams</option>
-                            </select>
-                            <div class="overSelect"></div>
+                          <div class="selectBox">
+                            <input id="searchBar" type="text" placeholder="Search teams" oninput="highlightTeams()">
+                            <button type="button" id="showhidedbutton" onclick="showCheckboxes()">Show</button>
                           </div>
                           <div id="checkboxes">
                           </div>
