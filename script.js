@@ -92,7 +92,13 @@ function createCheckboxes(){
   });
 }
 var expanded = false;
-function showCheckboxes() {
+function showCheckboxes(){
+  var checkboxes = document.getElementById("checkboxes");
+  checkboxes.style.display = "block";
+  expanded = true;
+  document.getElementById("showhidedbutton").innerText = "Hide"
+}
+function showHideCheckboxes() {
   var checkboxes = document.getElementById("checkboxes");
   // display or hide checkbox
   if (!expanded) {
