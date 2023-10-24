@@ -280,6 +280,7 @@ function createBarCharts(){
     .enter()
     .append("rect")
     .on("mouseover", handleMouseOveBarChart)
+    .on("mousemove", handleMouseOveBarChart)
     .on("mouseout", handleMouseOutBarChart)
     .attr("class", "bar")
     .attr("x", xScaleW(0))
@@ -341,6 +342,7 @@ function createBarCharts(){
     .enter()
     .append("rect")
     .on("mouseover", handleMouseOveBarChart)
+    .on("mousemove", handleMouseOveBarChart)
     .on("mouseout", handleMouseOutBarChart)
     .attr("class", "bar")
     .attr("x", xScaleW(0))
@@ -726,11 +728,6 @@ function showTooltipParallel(event, dimension) {
   tooltip.style("opacity", 1);
 }
 
-// Function to hide the tooltip
-function hideTooltip() {
-  // Hide the tooltip
-  d3.select("#tooltip").transition().duration(150).style("opacity", 0);
-}
 
 function createDensityPlot() {
   // Get the container div element

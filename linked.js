@@ -9,10 +9,11 @@ function handleMouseOveBarChart(event, item) {
       return item.name == d.name
     })
     .attr("stroke", "black")
-    .attr("stroke-width","2px")
-    .append("title")
-    .text(d => `team : ${codeToName[d.name]}\nwins : ${d.wins}, losses : ${d.losses}\nwins ratio : ${d.winsRatio.toFixed(2)}`); // Change the fill color of the matching elements to red
+    .attr("stroke-width","2px");
+    //.append("title")
+    //.text(d => `team : ${codeToName[d.name]}\nwins : ${d.wins}, losses : ${d.losses}\nwins ratio : ${d.winsRatio.toFixed(2)}`); // Change the fill color of the matching elements to red
 
+    showTooltipBar(event, item);
     currentData_barChartHoover = originalData.filter((d) => {return item.name == d.opp});
     updateParallelCoordinatesHooverBarChart(aggregateFilteredData());
 }
@@ -22,8 +23,32 @@ function handleMouseOutBarChart(event, item){
     .selectAll(".bar")
     .attr("stroke", "none")
 
+  hideTooltip();
+
   currentData_barChartHoover = originalData;
   updateParallelCoordinates(aggregateFilteredData());
+}
+
+function showTooltipBar(event, item) {
+  // Get the mouse position
+  const [x, y] = [event.pageX, event.pageY];
+
+  let tooltip = d3.select("#tooltip");
+  // Set the tooltip text and position
+  tooltip
+    .text(`Team: ${codeToName[item.name]} || Wins: ${item.wins} || Losses: ${item.losses} || Wins ratio: ${item.winsRatio.toFixed(2)}`) // Format the axis value as needed
+    .style("left", x + "px")
+    .style("top", (y - 30) + "px")
+    .style("font-family", "Nunito, sans-serif"); // Adjust the vertical position of the tooltip
+
+  // Show the tooltip
+  tooltip.style("opacity", 1);
+}
+
+// Function to hide the tooltip
+function hideTooltip() {
+  // Hide the tooltip
+  d3.select("#tooltip").transition().duration(150).style("opacity", 0);
 }
 
 
