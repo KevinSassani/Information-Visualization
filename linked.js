@@ -86,12 +86,16 @@ function aggregateFilteredData() {
     // Find the common data points by intersecting the sets
     const commonDataPoints = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsHoover.has(id));
   
+    /*
     // Filter the datasets to include only common data points
     const aggregatedDataset = currentData_parallelCoordinates
       .filter(d => commonDataPoints.includes(d.id))
       .concat(currentData_barCharts.filter(d => commonDataPoints.includes(d.id)))
       .concat(currentData_barChartHoover.filter(d => commonDataPoints.includes(d.id)))
       .concat(currentData_seasonSlider.filter(d => commonDataPoints.includes(d.id)));
+    */
+    // Filter the datasets to include only common data points
+    const aggregatedDataset = originalData.filter(d => commonDataPoints.includes(d.id));
   
     return aggregatedDataset;
 }
