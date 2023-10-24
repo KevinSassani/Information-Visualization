@@ -919,11 +919,11 @@ function createDensityPlot() {
       );
 
     // Add legend
-    svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", 6).style("fill", "#69b3a2");
-    svg.append("text").attr("x", 320).attr("y", 30).text("Boston Celtics score").style("font-size", "15px").attr("alignment-baseline", "middle");
+    svg.append("circle").attr("cx", 750).attr("cy", 30).attr("r", 6).style("fill", "#69b3a2");
+    svg.append("text").attr("x", 770).attr("y", 30).text("Boston Celtics score").style("font-size", "15px").attr("alignment-baseline", "middle");
 
-    svg.append("circle").attr("cx", 300).attr("cy", 50).attr("r", 6).style("fill", "#404080");
-    svg.append("text").attr("x", 320).attr("y", 50).text("Opponent score").style("font-size", "15px").attr("alignment-baseline", "middle");
+    svg.append("circle").attr("cx", 750).attr("cy", 50).attr("r", 6).style("fill", "#404080");
+    svg.append("text").attr("x", 770).attr("y", 50).text("Opponent score").style("font-size", "15px").attr("alignment-baseline", "middle");
 
 
 
