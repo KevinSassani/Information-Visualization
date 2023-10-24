@@ -717,7 +717,7 @@ function showTooltipParallel(event, dimension) {
   const [x, y] = [event.pageX, event.pageY];
 
   // Invert the y-coordinate to find the corresponding axis value
-  const axisValue = yScale[dimension].invert(y - margin.top - margin.bottom - 18);
+  const axisValue = yScale[dimension].invert(y - margin.top - margin.bottom -55);
 
   let tooltip = d3.select("#tooltip");
   // Set the tooltip text and position
