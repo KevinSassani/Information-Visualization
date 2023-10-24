@@ -728,11 +728,6 @@ function showTooltipParallel(event, dimension) {
   tooltip.style("opacity", 1);
 }
 
-// Function to hide the tooltip
-function hideTooltip() {
-  // Hide the tooltip
-  d3.select("#tooltip").transition().duration(150).style("opacity", 0);
-}
 
 function createDensityPlot() {
   // Get the container div element
