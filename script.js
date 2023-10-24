@@ -883,7 +883,7 @@ function createDensityPlot() {
 
     // Calculate the max and min values for the filtered "tm" data
     var xFiltered = d3.scaleLinear()
-      .domain([56, 150]) // Fixed x-axis domain
+      .domain([40, 160]) // Fixed x-axis domain
       .nice()
       .range([0, width]);
     
