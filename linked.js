@@ -1,3 +1,4 @@
+var currentlyClickedTeam = "non";
 
 // Function to handle mouseover event in barchars viz
 function handleMouseOveBarChart(event, item) {
@@ -18,6 +19,36 @@ function handleMouseOveBarChart(event, item) {
     data_hoover = aggregateFilteredData();
     updateParallelCoordinatesHooverBarChart(data_hoover);
     updateDensityPlot(data_hoover);
+}
+
+
+// Function to handle click event in barcharts viz
+function handleMouseClickBarChart(event, item) {
+
+
+  if (currentlyClickedTeam == item.name) {
+    // Team already clicked so unselect it
+    currentData_barChartClick = originalData;
+    updateParallelCoordinates(aggregateFilteredData());
+    currentlyClickedTeam = "non"
+
+  } else {
+
+    // Select all elements with class "data" and filter based on the item's properties
+    d3.select("#barCharts")
+      .selectAll(".bar")
+      .filter(function (d) {
+        // Check if "properties" exist in both item and d objects
+        return item.name == d.name
+      })
+      .attr("stroke", "orange")
+      .attr("stroke-width","2px");
+
+      currentlyClickedTeam = item.name;
+      currentData_barChartClick = originalData.filter((d) => {return item.name == d.opp});
+      updateParallelCoordinatesHooverBarChart(aggregateFilteredData());
+
+  }
 }
 
 function handleMouseOutBarChart(event, item){

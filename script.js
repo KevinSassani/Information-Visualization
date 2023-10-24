@@ -283,6 +283,7 @@ function createBarCharts(){
     .on("mouseover", handleMouseOveBarChart)
     .on("mousemove", handleMouseOveBarChart)
     .on("mouseout", handleMouseOutBarChart)
+    .on("click", handleMouseClickBarChart)
     .attr("class", "bar")
     .attr("x", xScaleW(0))
     .attr("y", d => yScaleW(d.name))
