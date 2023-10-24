@@ -6,6 +6,8 @@ var currentData;
 var currentData_parallelCoordinates;
 var currentData_barCharts;
 var currentData_seasonSlider;
+var currentData_pointsSlider;
+var currentData_pointsSlider2;
 // Create an object to store your scales
 const yScale = {};
 const codeToName = {"ATL" : "Atlanta Hawks",
@@ -158,6 +160,8 @@ function startDashboard() {
     currentData_barCharts = originalData;
     currentData_seasonSlider = originalData;
     currentData_barChartHoover = originalData;
+    currentData_pointsSlider = originalData;
+    currentData_pointsSlider2 = originalData;
 
     // Call functions to create the plots
     createSeasonSlider();
@@ -777,6 +781,13 @@ function createDensityPlot() {
     minSliderValue = val[0];
     maxSliderValue = val[1];
     redrawDensityPlot('tm', minSliderValue, maxSliderValue);
+    currentData_pointsSlider = currentData.filter((d) => {
+      return (d.tm >= minSliderValue && d.tm <= maxSliderValue);
+    });
+    
+    // Call update functions
+    updateBarChart(currentData_pointsSlider);
+    updateParallelCoordinates(currentData_pointsSlider);
   });
 
   sliderSvg.call(sliderRange);
@@ -805,6 +816,13 @@ function createDensityPlot() {
     minSliderValue2 = val2[0];
     maxSliderValue2 = val2[1];
     redrawDensityPlot('opp_score', minSliderValue2, maxSliderValue2);
+    currentData_pointsSlider2 = currentData.filter((d) => {
+      return (d.opp_score >= minSliderValue2 && d.opp_score <= maxSliderValue2);
+    });
+    
+    // Call update functions
+    updateBarChart(currentData_pointsSlider2);
+    updateParallelCoordinates(currentData_pointsSlider2);
   });
 
   sliderSvg2.call(sliderRange2);
