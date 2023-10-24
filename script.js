@@ -832,11 +832,6 @@ function createDensityPlot() {
 
   // Get the height of the #densityPlotFigure
 
-
-
-  
-  
-
   function kernelDensityEstimator(kernel, X) {
     return function (V) {
       return X.map(function (x) {
@@ -844,6 +839,7 @@ function createDensityPlot() {
       });
     }
   }
+
 
   function kernelEpanechnikov(k) {
     return function (v) {
@@ -865,10 +861,11 @@ function createDensityPlot() {
       .domain([56, 150]) // Fixed x-axis domain
       .nice()
       .range([0, width]);
-    
 
-    console.log(min)
-    console.log(max)
+    console.log("Min:"+min)
+    console.log("Max: "+max)
+    console.log("Filtered min: "+d3.min(filteredData, d => d[fieldToFilter]))
+    console.log("Filtered max: "+d3.max(filteredData, d => d[fieldToFilter]))
     // Update the x-axis domain
     
     
@@ -916,15 +913,11 @@ function createDensityPlot() {
       );
 
     // Add legend
-    svg.append("circle").attr("cx", 300).attr("cy", 30).attr("r", 6).style("fill", "#69b3a2");
-    svg.append("text").attr("x", 320).attr("y", 30).text("Boston Celtics score").style("font-size", "15px").attr("alignment-baseline", "middle");
+    svg.append("circle").attr("cx", 750).attr("cy", 30).attr("r", 6).style("fill", "#69b3a2");
+    svg.append("text").attr("x", 770).attr("y", 30).text("Boston Celtics score").style("font-size", "15px").attr("alignment-baseline", "middle");
 
-    svg.append("circle").attr("cx", 300).attr("cy", 50).attr("r", 6).style("fill", "#404080");
-    svg.append("text").attr("x", 320).attr("y", 50).text("Opponent score").style("font-size", "15px").attr("alignment-baseline", "middle");
-
-
-
-
+    svg.append("circle").attr("cx", 750).attr("cy", 50).attr("r", 6).style("fill", "#404080");
+    svg.append("text").attr("x", 770).attr("y", 50).text("Opponent score").style("font-size", "15px").attr("alignment-baseline", "middle");
   }
 
 }
