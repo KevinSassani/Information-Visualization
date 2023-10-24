@@ -740,9 +740,6 @@ function createDensityPlot() {
   const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
   const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom - 40;
 
-  var sliderContainer = d3.select("#densityPlot")
-  .append("div")
-  .attr("id", "slider-container");
   
 
 
