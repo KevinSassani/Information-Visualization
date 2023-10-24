@@ -15,7 +15,9 @@ function handleMouseOveBarChart(event, item) {
 
     showTooltipBar(event, item);
     currentData_barChartHoover = originalData.filter((d) => {return item.name == d.opp});
-    updateParallelCoordinatesHooverBarChart(aggregateFilteredData());
+    data_hoover = aggregateFilteredData();
+    updateParallelCoordinatesHooverBarChart(data_hoover);
+    updateDensityPlot(data_hoover);
 }
 
 function handleMouseOutBarChart(event, item){
@@ -26,7 +28,9 @@ function handleMouseOutBarChart(event, item){
   hideTooltip();
 
   currentData_barChartHoover = originalData;
-  updateParallelCoordinates(aggregateFilteredData());
+  data_hoover_out = aggregateFilteredData();
+  updateParallelCoordinates(data_hoover_out);
+  updateDensityPlot(data_hoover_out);
 }
 
 function showTooltipBar(event, item) {
@@ -99,6 +103,7 @@ function brushed({ selection }, key, data) {
     // Update plots
     updateBarChart(currentData);
     updateParallelCoordinates(currentData)
+    updateDensityPlot(currentData);
 }
 
 function aggregateFilteredData() {
