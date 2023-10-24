@@ -775,13 +775,9 @@ function createDensityPlot() {
     .step(1)
     .ticks(0);
   
-  var y;
+
   sliderRange.on('onchange', val => {
     //x.domain(val);
-    var y = d3.scaleLinear()
-      .range([height, 0])
-      .domain([0, 0.2])
-      .nice();
     minSliderValue = val[0];
     maxSliderValue = val[1];
     redrawDensityPlot('tm', minSliderValue, maxSliderValue);
@@ -843,9 +839,10 @@ function createDensityPlot() {
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
 
+
   var y = d3.scaleLinear()
     .range([height, 0])
-    .domain([0, 0.1])
+    .domain([0, 0.07])
     .nice();
   
   svg.append("g")
@@ -882,6 +879,7 @@ function createDensityPlot() {
     // Filter the data based on the selected field
     const filteredData = originalData.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
 
+    console.log(filteredData)
 
     // Calculate the max and min values for the filtered "tm" data
     var xFiltered = d3.scaleLinear()
@@ -890,6 +888,8 @@ function createDensityPlot() {
       .range([0, width]);
     
 
+    console.log(min)
+    console.log(max)
     // Update the x-axis domain
     
     
@@ -897,7 +897,6 @@ function createDensityPlot() {
     var density = kde(filteredData.map(function (d) {
     return d[dataField];
   }));
-
 
     
 
@@ -923,6 +922,11 @@ function createDensityPlot() {
       return d[dataField]; // 'tm' or 'opp_score'
     }));
 
+    var xFiltered = d3.scaleLinear()
+      .domain([40, 160]) // Fixed x-axis domain
+      .nice()
+      .range([0, width]);
+
     svg.append("path")
       .attr("class", "mypath-" + dataField)
       .datum(density)
@@ -933,7 +937,7 @@ function createDensityPlot() {
       .attr("stroke-linejoin", "round")
       .attr("d", d3.line()
         .curve(d3.curveBasis)
-        .x(function (d) { return x(d[0]); })
+        .x(function (d) { return xFiltered(d[0]); })
         .y(function (d) { return y(d[1]); })
       );
 
