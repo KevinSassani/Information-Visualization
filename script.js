@@ -503,6 +503,7 @@ function teamChange(team){
   document.getElementById("selectAll").checked = false
   updateBarChart(currentData)
   updateParallelCoordinates(currentData)
+  updateDensityPlot(currentData)
 }
 // TODO : team selection
 
@@ -530,6 +531,7 @@ function selectAll(){
 
   updateBarChart(currentData)
   updateParallelCoordinates(currentData)
+  updateDensityPlot(currentData)
 }
 
 function createParallelCoordinates() {
