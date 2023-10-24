@@ -344,3 +344,82 @@ function updateParallelCoordinatesHooverBarChart(data) {
     d3.selectAll(".brush").raise();
 
 }
+
+function kernelDensityEstimator(kernel, X) {
+    return function (V) {
+      return X.map(function (x) {
+        return [x, d3.mean(V, function (v) { return kernel(x - v); })];
+      });
+    }
+    }
+    
+    function kernelEpanechnikov(k) {
+    return function (v) {
+      return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+    };
+    }
+    
+    function updateDensityPlot(currentData){
+    
+    minimum = d3.min(currentData, d => Math.min(d.tm, d.opp_score));
+    maximum = d3.max(currentData, d => Math.max(d.tm, d.opp_score));
+    field = "tm";
+    updateCurve(field, currentData, minimum, maximum);
+    field = "opp_score"
+    updateCurve(field, currentData, minimum, maximum);
+    }
+    
+    
+    
+    function updateCurve(fieldValue, data, min, max){
+    const containerDiv = document.getElementById("densityPlotFigure");
+    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom - 40;
+    const fieldToFilter = dataField = fieldValue;
+    
+    // Filter the data based on the selected field
+    const filteredData = data.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
+    
+    console.log(filteredData)
+    
+    
+    // Calculate the max and min values for the filtered "tm" data
+    var xFiltered = d3.scaleLinear()
+      .domain([56, 150]) // Fixed x-axis domain
+      .nice()
+      .range([0, width]);
+    
+    
+    
+    // Update the x-axis domain
+    
+    
+    var kde = kernelDensityEstimator(kernelEpanechnikov(7), xFiltered.ticks(60));
+    var density = kde(filteredData.map(function (d) {
+    return d[dataField];
+    }));
+    
+    
+    
+    
+    
+    var y = d3.scaleLinear()
+      .range([height, 0])
+      .domain([0, 0.07])
+      .nice();
+    
+    
+    
+    d3.select(".mypath-" + dataField)
+      .datum(density)
+      .transition()
+      .duration(300)
+      .attr("d", d3.line()
+        .curve(d3.curveBasis)
+        .x(function (d) { 
+          return xFiltered(d[0]); })
+        .y(function (d) { return y(d[1]); })
+      );
+    
+    
+    }

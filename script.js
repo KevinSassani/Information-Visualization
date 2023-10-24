@@ -230,6 +230,7 @@ function createSeasonSlider() {
     // Call update functions
     updateBarChart(currentData);
     updateParallelCoordinates(currentData);
+    updateDensityPlot(currentData);
 
   });
 
