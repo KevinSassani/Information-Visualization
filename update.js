@@ -68,6 +68,10 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("width", 0)
     .attr("height", yScaleW.bandwidth())
     .attr("fill", d => d3.interpolateGreens(fillScale(d.winsRatio)))
+    .on("mouseover", handleMouseOveBarChart)
+    .on("mousemove", handleMouseOveBarChart)
+    .on("mouseout", handleMouseOutBarChart)
+    .on("click", handleMouseClickBarChart)
     .transition()
     .duration(1000)
     .attr("width",d => xScaleW(d.wins));
@@ -132,6 +136,10 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("width", 0)
     .attr("height", yScaleL.bandwidth())
     .attr("fill", d => d3.interpolateReds(fillScale(d.lossesRatio)))
+    .on("mouseover", handleMouseOveBarChart)
+    .on("mousemove", handleMouseOveBarChart)
+    .on("mouseout", handleMouseOutBarChart)
+    .on("click", handleMouseClickBarChart)
     .transition()
     .duration(1000)
     .attr("width",d => xScaleL(d.losses));
@@ -331,9 +339,6 @@ function updateParallelCoordinatesHooverBarChart(data) {
       if (isActive) {
         // Raise only if isActive is true
         d3.select(this).raise();
-        d3.select(this).style("opacity", 1);
-      } else {
-        d3.select(this).style("opacity", 0.5);
       }
       return isActive ? selectedColor : deselectedColor;
     })
@@ -343,6 +348,94 @@ function updateParallelCoordinatesHooverBarChart(data) {
     d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
     d3.selectAll(".brush").raise();
 
+}
+
+function updateParallelCoordinatesPermanentSelectionClick(filterResults) {
+  clickData = filterResults[0];
+  hooverData = filterResults[1];
+  console.log("Click Data: "+clickData);
+  console.log("Hoover Data: "+hooverData);
+  
+
+  const deselectedColor = "rgb(221, 221, 221)";
+  const hooverColor = "rgb(255,165,0)";//"rgb(0, 104, 71)";
+  const clickColor = "rgb(0, 178, 243)";//"rgb(0, 104, 71)";
+
+  // Get the container div element
+  const containerDiv = document.getElementById("parallelCoordinates");
+
+  // Get the width and height of the container using getBoundingClientRect()
+  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+
+
+  // Choose dimensions to include in the plot
+  dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
+
+  xScale = d3.scalePoint()
+  .range([0, width])
+  .domain(dimensions);
+
+
+  // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
+  function path(d) {
+    return d3.line()(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+  }
+
+  if (!(hooverData == null)) { // Both hoover and click is active so show lines in two different colors
+    // Update the lines based on the filtered data
+    d3.selectAll(".line")
+    .data(originalData)
+    .join("path")
+    //.attr("class", function (d) { return "line season-" + d.season })
+    .attr("d", (d) => path(d))
+    .style("fill", "none")
+    .style("stroke", function (d) {
+      const clickActive = clickData.some((dataPoint) => dataPoint.id === d.id);
+      const hooverActive = hooverData.some((dataPoint) => dataPoint.id === d.id);
+      if (clickActive) {
+        // Raise only if active
+        d3.select(this).raise();
+        d3.select(this).style("opacity", 0.5);
+        return clickColor;
+      } else if (hooverActive) {
+        // Raise only if active
+        d3.select(this).raise();
+        d3.select(this).style("opacity", 0.6);
+        return hooverColor;
+      } else {
+        d3.select(this).style("opacity", 0.2);
+        return deselectedColor;
+      }
+    });
+    //.style("stroke", function (d) { return (colorScale(d.season)) })
+    //.style("opacity", 0.5);
+
+  d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
+  d3.selectAll(".brush").raise();
+
+  } else { // Only click is active so only display that data
+
+  // Update the lines based on the filtered data
+  d3.selectAll(".line")
+    .data(originalData)
+    .join("path")
+    //.attr("class", function (d) { return "line season-" + d.season })
+    .attr("d", (d) => path(d))
+    .style("fill", "none")
+    .style("stroke", function (d) {
+      const isActive = clickData.some((dataPoint) => dataPoint.id === d.id);
+      if (isActive) {
+        // Raise only if isActive is true
+        d3.select(this).raise();
+      }
+      return isActive ? clickColor : deselectedColor;
+    })
+    //.style("stroke", function (d) { return (colorScale(d.season)) })
+    .style("opacity", 0.5);
+
+    d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
+    d3.selectAll(".brush").raise();
+  }
 }
 
 function kernelDensityEstimator(kernel, X) {
@@ -380,7 +473,7 @@ function updateCurve(fieldValue, data, min, max){
     // Filter the data based on the selected field
     const filteredData = data.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
     
-    console.log(filteredData)
+    //console.log(filteredData)
     
     
     // Calculate the max and min values for the filtered "tm" data

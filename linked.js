@@ -1,8 +1,12 @@
 
+const clickedColor = "rgb(0, 178, 243)";
+const hooverColor = "rgb(255,165,0)";
+
 // Function to handle mouseover event in barchars viz
 function handleMouseOveBarChart(event, item) {
-  // Select all elements with class "data" and filter based on the item's properties
-  d3.select("#barCharts")
+  if (currentlyClickedTeam == "non") { // Team is not clicked in bar chart
+    // Select all elements with class "data" and filter based on the item's properties
+    d3.select("#barCharts")
     .selectAll(".bar")
     .filter(function (d) {
       // Check if "properties" exist in both item and d objects
@@ -18,19 +22,96 @@ function handleMouseOveBarChart(event, item) {
     data_hoover = aggregateFilteredData();
     updateParallelCoordinatesHooverBarChart(data_hoover);
     updateDensityPlot(data_hoover);
+  } else { // A team is clicked in the bar chart
+    // Select all elements with class "data" and filter based on the item's properties
+    d3.select("#barCharts")
+    .selectAll(".bar")
+    .filter(function (d) {
+      // Check if "properties" exist in both item and d objects
+      return item.name == d.name
+    })
+    //.attr("stroke", "rgb(255,165,0)")
+    .attr("stroke", function (d) {
+      if (d.name == currentlyClickedTeam) {
+        return clickedColor;
+      } else {
+        return hooverColor;
+      }
+    })
+    .attr("stroke-width","2px");
+
+    showTooltipBar(event, item);
+    currentData_barChartHoover = originalData.filter((d) => {return item.name == d.opp});
+    updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(true));
+
+  }
+  
+}
+
+
+// Function to handle click event in barcharts viz
+function handleMouseClickBarChart(event, item) {
+
+
+  if (currentlyClickedTeam == item.name) {
+    // Team already clicked so unselect it
+    currentData_barChartClick = originalData;
+    updateParallelCoordinates(aggregateFilteredData());
+    currentlyClickedTeam = "non"
+    console.log(currentlyClickedTeam);
+
+  } else {
+
+    // Select all elements with class "data" and filter based on the item's properties
+    d3.select("#barCharts")
+      .selectAll(".bar")
+      .filter(function (d) {
+        // Check if "properties" exist in both item and d objects
+        return item.name == d.name
+      })
+      .attr("stroke", clickedColor)
+      .attr("stroke-width","2px");
+
+      currentlyClickedTeam = item.name;
+      console.log(currentlyClickedTeam);
+      currentData_barChartClick = originalData.filter((d) => {return item.name == d.opp}); // Maybe should not include this data in the aggreagate function, do concate here instead?
+      updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+
+  }
 }
 
 function handleMouseOutBarChart(event, item){
-  d3.select("#barCharts")
-    .selectAll(".bar")
-    .attr("stroke", "none")
+  
 
   hideTooltip();
 
-  currentData_barChartHoover = originalData;
-  data_hoover_out = aggregateFilteredData();
-  updateParallelCoordinates(data_hoover_out);
-  updateDensityPlot(data_hoover_out);
+  if (currentlyClickedTeam == "non") {
+    d3.select("#barCharts")
+    .selectAll(".bar")
+    .attr("stroke", "none")
+
+    currentData_barChartHoover = originalData;
+    data_hoover_out = aggregateFilteredData();
+    updateParallelCoordinates(data_hoover_out);
+    updateDensityPlot(data_hoover_out);
+  } else {
+    d3.select("#barCharts")
+    .selectAll(".bar")
+    .each(function (d) {
+      if (!(d.name == currentlyClickedTeam)) {
+        d3.select(this).attr("stroke", "none");
+      }
+    });
+    /*.attr("stroke", function (d) {
+        if (!(d.name == currentlyClickedTeam)) {
+          return "none";
+        }
+    });*/
+
+    currentData_barChartHoover = originalData;
+    updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+  }
+  
 }
 
 function showTooltipBar(event, item) {
@@ -70,7 +151,7 @@ function brushed({ selection }, key, data) {
 
   const selected = [];
 
-  // Iterate through the paths and update their appearance based on the selection
+  // Iterate through the paths 
   d3.selectAll(".line")
   .each(function(d) {
     // Initialize an 'active' flag to true if the data point is included in the filtered data
@@ -98,12 +179,21 @@ function brushed({ selection }, key, data) {
     
     currentData_parallelCoordinates = originalData.filter((d) => {return selected.includes(d)});   
 
-    currentData = aggregateFilteredData();
+    if (currentlyClickedTeam == "non") {
+      currentData = aggregateFilteredData();
 
-    // Update plots
-    updateBarChart(currentData);
-    updateParallelCoordinates(currentData)
-    updateDensityPlot(currentData);
+      // Call update functions
+      updateBarChart(currentData);
+      updateParallelCoordinates(currentData);
+      updateDensityPlot(currentData);
+    } else { // If a team is clicked in bar chart
+      currentData = aggregateFilteredData();
+
+      // Call update functions
+      updateBarChart(currentData);
+      updateDensityPlot(currentData);
+      updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+    }
 }
 
 function aggregateFilteredData() {
@@ -112,25 +202,54 @@ function aggregateFilteredData() {
     const set_barCharts = new Set(currentData_barCharts.map(d => d.id));
     const set_barChartsHoover = new Set(currentData_barChartHoover.map(d => d.id));
     const set_season = new Set(currentData_seasonSlider.map(d => d.id));
+    // ADD FOR DENSITY PLOT AS WELL
   
     // Find the common data points by intersecting the sets
     const commonDataPoints = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsHoover.has(id));
   
-    /*
-    // Filter the datasets to include only common data points
-    const aggregatedDataset = currentData_parallelCoordinates
-      .filter(d => commonDataPoints.includes(d.id))
-      .concat(currentData_barCharts.filter(d => commonDataPoints.includes(d.id)))
-      .concat(currentData_barChartHoover.filter(d => commonDataPoints.includes(d.id)))
-      .concat(currentData_seasonSlider.filter(d => commonDataPoints.includes(d.id)));
-    */
-    // Filter the datasets to include only common data points
     const aggregatedDataset = originalData.filter(d => commonDataPoints.includes(d.id));
   
     return aggregatedDataset;
 }
 
+function aggregateFilteredDataPermanentSelection(hooverActive) {
 
+  if (hooverActive) {
+    // Create a Set for each dataset to store unique data points
+    const set_parallel = new Set(currentData_parallelCoordinates.map(d => d.id));
+    const set_barCharts = new Set(currentData_barCharts.map(d => d.id));
+    const set_season = new Set(currentData_seasonSlider.map(d => d.id));
+    // ADD FOR DENSITY PLOT AS WELL
+
+    const set_barChartsHoover = new Set(currentData_barChartHoover.map(d => d.id));
+    const set_barChartsClick = new Set(currentData_barChartClick.map(d => d.id));
+
+    // Apply filtering to the clicked and hoovered data to keep already applied filters from other idoms/filters
+    const commonDataPointsHoover = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsHoover.has(id));
+    const commonDataPointsClick = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsClick.has(id));
+  
+    const hooverDataset = originalData.filter(d => commonDataPointsHoover.includes(d.id));
+    const clickDataset = originalData.filter(d => commonDataPointsClick.includes(d.id));
+  
+    return [clickDataset, hooverDataset];
+  } else {
+    // Create a Set for each dataset to store unique data points
+    const set_parallel = new Set(currentData_parallelCoordinates.map(d => d.id));
+    const set_barCharts = new Set(currentData_barCharts.map(d => d.id));
+    const set_season = new Set(currentData_seasonSlider.map(d => d.id));
+    // ADD FOR DENSITY PLOT AS WELL
+
+    
+    const set_barChartsClick = new Set(currentData_barChartClick.map(d => d.id));
+
+    // Apply filtering to the clicked and hoovered data to keep already applied filters from other idoms/filters
+    const commonDataPointsClick = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsClick.has(id));
+  
+    const clickDataset = originalData.filter(d => commonDataPointsClick.includes(d.id));
+  
+    return [clickDataset, null];
+  }
+}
 
 function createYScale(data, dimensions) {
   const yScale = {};

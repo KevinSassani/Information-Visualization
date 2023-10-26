@@ -1,13 +1,19 @@
 
-// Global data variable
-// Define a global variable to store the loaded CSV data
+// Global data variables
 var originalData;
 var currentData;
 var currentData_parallelCoordinates;
 var currentData_barCharts;
 var currentData_seasonSlider;
+
+var currentData_barChartHoover;
+var currentData_barChartClick;
+
+var currentlyClickedTeam = "non";
+
 var currentData_pointsSlider;
 var currentData_pointsSlider2;
+
 // Create an object to store your scales
 const yScale = {};
 const codeToName = {"ATL" : "Atlanta Hawks",
@@ -160,8 +166,10 @@ function startDashboard() {
     currentData_barCharts = originalData;
     currentData_seasonSlider = originalData;
     currentData_barChartHoover = originalData;
+    currentData_barChartClick = originalData;
     currentData_pointsSlider = originalData;
     currentData_pointsSlider2 = originalData;
+
 
     // Call functions to create the plots
     createSeasonSlider();
@@ -229,12 +237,21 @@ function createSeasonSlider() {
       return (d.season >= lowSeason && d.season <= highSeason);
     });
 
-    currentData = aggregateFilteredData();
+    if (currentlyClickedTeam == "non") {
+      currentData = aggregateFilteredData();
 
-    // Call update functions
-    updateBarChart(currentData);
-    updateParallelCoordinates(currentData);
-    updateDensityPlot(currentData);
+      // Call update functions
+      updateBarChart(currentData);
+      updateParallelCoordinates(currentData);
+      updateDensityPlot(currentData);
+    } else { // If a team is clicked in bar chart
+      currentData = aggregateFilteredData();
+
+      // Call update functions
+      updateBarChart(currentData);
+      updateDensityPlot(currentData);
+      updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+    }
 
   });
 
@@ -287,6 +304,7 @@ function createBarCharts(){
     .on("mouseover", handleMouseOveBarChart)
     .on("mousemove", handleMouseOveBarChart)
     .on("mouseout", handleMouseOutBarChart)
+    .on("click", handleMouseClickBarChart)
     .attr("class", "bar")
     .attr("x", xScaleW(0))
     .attr("y", d => yScaleW(d.name))
