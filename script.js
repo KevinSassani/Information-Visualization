@@ -324,19 +324,22 @@ function createBarCharts(){
     .attr("class", "x-axis")
     .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
     .call(d3.axisBottom(xScaleW))
-    .style("font-family", "Nunito, sans-serif");
+    .style("font-family", "Nunito, sans-serif")
+    .style("font-size", "12px");
   // Add y-axis
   svgW.append("g")
     .attr("class", "y-axis")
     .call(d3.axisLeft(yScaleW))
-    .style("font-family", "Nunito, sans-serif");
+    .style("font-family", "Nunito, sans-serif")
+    .style("font-size", "12px");
   // Add X-axis legend
   svgW.append("text")
     .attr("class", "x-axis-legend")
     .attr("x", margin.left)
     .attr("y", height - margin.bottom + 20)
     .text("Games won")
-    .style("font-family", "Nunito, sans-serif");
+    .style("font-family", "Nunito, sans-serif")
+    .style("font-size", "14px");
     
   // Add Y-axis legend
   svgW.append("text")
@@ -345,7 +348,8 @@ function createBarCharts(){
     .attr("x", -height / 2)
     .attr("y", -margin.left)
     .text("Teams")
-    .style("font-family", "Nunito, sans-serif");
+    .style("font-family", "Nunito, sans-serif")
+    .style("font-size", "14px");
 
   // losses svg
   const svgL = d3
@@ -387,17 +391,20 @@ function createBarCharts(){
     .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
     .call(d3.axisBottom(xScaleL))
     .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("font-size", "12px");
   // Add y-axis
   svgL.append("g")
     .attr("class", "y-axis")
     .call(d3.axisLeft(yScaleL))
     .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("font-size", "12px");
   svgL.append("text")
     .attr("class", "x-axis-legend")
     .attr("x", margin.left)
     .attr("y", height - margin.bottom + 20)
     .text("Games lost")
-    .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("font-family", "Nunito, sans-serif")
+    .style("font-size", "14px"); // Set the font-family
   // Add Y-axis legend
   svgL.append("text")
     .attr("class", "y-axis-legend")
@@ -406,6 +413,7 @@ function createBarCharts(){
     .attr("y", -margin.left)
     .text("Teams")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("font-size", "14px");
 }
 
 function createBarChartsLegend(){
@@ -669,6 +677,7 @@ function createParallelCoordinates() {
   .on("mouseover", showTooltipParallel)
   .on("mousemove", showTooltipParallel)
   .on("mouseleave", hideTooltip)
+  .style("font-size", "12px")
   // And I build the axis with the call function
   .each(function(d) {
     // Calculate the min and max values for the current dimension
@@ -704,7 +713,7 @@ function createParallelCoordinates() {
   })
   .style("fill", "black")
   .style("font-family", "Nunito, sans-serif")
-  .style("font-size", "12px");
+  .style("font-size", "14px");
  
   // Create the brush behavior along the y-axis.
    const brushes = []; // Create an array to store the brush instances
