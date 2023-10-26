@@ -442,7 +442,7 @@ function createBarChartsLegend(){
     .attr("height", height)
     .append("g")
     .attr("id", "winsLegendGroup")
-    .attr("transform", `translate(${margin.left + 50},${margin.top})`);
+    .attr("transform", `translate(${margin.left},${margin.top})`);
   lW
     .selectAll("rect")
     .data(legendColors)
@@ -451,7 +451,7 @@ function createBarChartsLegend(){
     .attr("x", (d,i) => i * 2)
     .attr("y", 10)
     .attr("width", 2)
-    .attr("height", "30px")
+    .attr("height", "2vw")
     .attr("fill", d => d3.interpolateGreens(d));
   lW.append("text")
     .attr("x", margin.left + 50)
@@ -471,7 +471,7 @@ function createBarChartsLegend(){
     .attr("height", height)
     .append("g")
     .attr("id", "lossesLegendGroup")
-    .attr("transform", `translate(${margin.left + 30},${margin.top})`);
+    .attr("transform", `translate(${margin.left},${margin.top})`);
   lL
     .selectAll("rect")
     .data(legendColors)
