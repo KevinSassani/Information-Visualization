@@ -269,7 +269,7 @@ function createBarCharts(){
   const padding = 30
 
   // first make a count for each opponent team of wins and loses.
-  wlTable = winsandlosses(currentData)
+  wlTable = winsandlosses(originalData)
   wTable = wlTable[0]
   lTable = wlTable[1]
 
@@ -519,13 +519,24 @@ function teamChange(team){
   }
   currentData_barCharts = originalData.filter((d) => {return selectedTeams.has(d.opp)})
 
-  currentData = aggregateFilteredData();
-
   selectAllTeams = false
   document.getElementById("selectAll").checked = false
-  updateBarChart(currentData)
-  updateParallelCoordinates(currentData)
-  updateDensityPlot(currentData)
+
+  if (currentlyClickedTeam == "non") {
+    currentData = aggregateFilteredData();
+
+    // Call update functions
+    updateBarChart(currentData);
+    updateParallelCoordinates(currentData);
+    updateDensityPlot(currentData);
+  } else { // If a team is clicked in bar chart
+    currentData = aggregateFilteredData();
+
+    // Call update functions
+    updateBarChart(currentData);
+    updateDensityPlot(currentData);
+    updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+  }
 }
 // TODO : team selection
 
@@ -549,11 +560,21 @@ function selectAll(){
     selectAllTeams = false
   }
 
-  currentData = aggregateFilteredData();
+  if (currentlyClickedTeam == "non") {
+    currentData = aggregateFilteredData();
 
-  updateBarChart(currentData)
-  updateParallelCoordinates(currentData)
-  updateDensityPlot(currentData)
+    // Call update functions
+    updateBarChart(currentData);
+    updateParallelCoordinates(currentData);
+    updateDensityPlot(currentData);
+  } else { // If a team is clicked in bar chart
+    currentData = aggregateFilteredData();
+
+    // Call update functions
+    updateBarChart(currentData);
+    updateDensityPlot(currentData);
+    updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+  }
 }
 
 function createParallelCoordinates() {
@@ -578,39 +599,9 @@ function createParallelCoordinates() {
     .append("g")
       .attr("transform",`translate(${margin.left},${margin.top})`);
 
-  // Color scale: different colors for each season
-  var customColors = [
-    "#007A33", // Boston Celtics' green
-    "#BA9653", // Custom color 2
-    "#FFFFFF", // White
-    "#000000", // Black
-    "#C8102E", // Another shade of green
-    "#D13870", // Another shade of green
-    "#D6A06F", // A light brownish color
-    "#007-DC3", // Another shade of green
-    "#B7A248", // A yellowish color
-    "#4A90E2", // A blue color
-    "#E03A3E", // A bright red color
-    "#FFA25D", // An orange color
-    "#6C6073", // A dark gray color
-    "#D7C6BB", // A light gray color
-    "#FF5736", // A bright orange color
-    "#00B2A9", // A teal color
-    "#4F0D3E", // A dark purple color
-    "#E2D1C3", // A light peach color
-    "#00A79D", // Another shade of teal
-    "#706962", // A dark olive green color
-    "#FDB927"  // A bright yellow color
-  ];
-
-  var colorScale = d3.scaleOrdinal()
-    .domain(["2022-23", "2021-22", "2020-21", "2019-20", "2018-19", "2017-18", "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11", "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04", "2002-03"])
-    .range(customColors);
-
   // Choose dimensions to include in the plot
   dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
 
-  
   
 
   // For each dimension, build a linear scale
@@ -799,13 +790,23 @@ function createDensityPlot() {
     minSliderValue = val[0];
     maxSliderValue = val[1];
     redrawDensityPlot('tm', minSliderValue, maxSliderValue);
-    currentData_pointsSlider = currentData.filter((d) => {
+    currentData_pointsSlider = originalData.filter((d) => {
       return (d.tm >= minSliderValue && d.tm <= maxSliderValue);
     });
     
-    // Call update functions
-    updateBarChart(currentData_pointsSlider);
-    updateParallelCoordinates(currentData_pointsSlider);
+    if (currentlyClickedTeam == "non") {
+      currentData = aggregateFilteredData();
+
+      // Call update functions
+      updateBarChart(currentData);
+      updateParallelCoordinates(currentData);
+    } else { // If a team is clicked in bar chart
+      currentData = aggregateFilteredData();
+
+      // Call update functions
+      updateBarChart(currentData);
+      updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+    }
   });
 
   sliderSvg.call(sliderRange);
@@ -834,13 +835,23 @@ function createDensityPlot() {
     minSliderValue2 = val2[0];
     maxSliderValue2 = val2[1];
     redrawDensityPlot('opp_score', minSliderValue2, maxSliderValue2);
-    currentData_pointsSlider2 = currentData.filter((d) => {
+    currentData_pointsSlider2 = originalData.filter((d) => {
       return (d.opp_score >= minSliderValue2 && d.opp_score <= maxSliderValue2);
     });
     
-    // Call update functions
-    updateBarChart(currentData_pointsSlider2);
-    updateParallelCoordinates(currentData_pointsSlider2);
+    if (currentlyClickedTeam == "non") {
+      currentData = aggregateFilteredData();
+
+      // Call update functions
+      updateBarChart(currentData);
+      updateParallelCoordinates(currentData);
+    } else { // If a team is clicked in bar chart
+      currentData = aggregateFilteredData();
+
+      // Call update functions
+      updateBarChart(currentData);
+      updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
+    }
   });
 
   sliderSvg2.call(sliderRange2);
@@ -897,17 +908,12 @@ function createDensityPlot() {
     // Filter the data based on the selected field
     const filteredData = originalData.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
 
-    console.log(filteredData)
-
     // Calculate the max and min values for the filtered "tm" data
     var xFiltered = d3.scaleLinear()
       .domain([40, 160]) // Fixed x-axis domain
       .nice()
       .range([0, width]);
     
-
-    console.log(min)
-    console.log(max)
     // Update the x-axis domain
     
     
