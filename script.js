@@ -82,7 +82,7 @@ function createCheckboxes(){
   allCheckbox.onchange = () => selectAll();
   const allLabel = document.createElement('label');
   allLabel.htmlFor = "selectAll";
-  allLabel.style.fontSize = "medium"
+  allLabel.style.fontSize = "0.8vw"
   allLabel.appendChild(allCheckbox);
   allLabel.appendChild(document.createTextNode("Select all"));
   checkboxes.appendChild(allLabel);
@@ -98,7 +98,7 @@ function createCheckboxes(){
   
     // Create a label element for the checkbox
     const label = document.createElement('label');
-    label.style.fontSize = "medium"
+    label.style.fontSize = "0.8vw";
     label.htmlFor = key.toLowerCase();
     label.appendChild(checkbox);
     label.appendChild(document.createTextNode(key));
