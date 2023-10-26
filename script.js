@@ -352,7 +352,8 @@ function createBarCharts(){
     .attr("y", -margin.left)
     .text("Teams")
     .style("font-family", "Nunito, sans-serif")
-    .style("font-size", "14px");
+    .style("font-size", "14px")
+    .style("font-weight", "bold");
 
   // losses svg
   const svgL = d3
@@ -416,7 +417,8 @@ function createBarCharts(){
     .attr("y", -margin.left)
     .text("Teams")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
-    .style("font-size", "14px");
+    .style("font-size", "14px")
+    .style("font-weight", "bold");
 }
 
 function createBarChartsLegend(){
@@ -457,6 +459,8 @@ function createBarChartsLegend(){
     .attr("text-anchor", "middle")
     .text("Wins Ratio")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("font-size", "14px")
+    .style("font-weight", "bold")
     .style("padding", "10") 
     
   // losses legend svg
@@ -484,6 +488,8 @@ function createBarChartsLegend(){
     .attr("text-anchor", "middle")
     .text("Loss Ratio")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
+    .style("font-size", "14px")
+    .style("font-weight", "bold")
     .style("padding", "10") 
 }
 
@@ -716,7 +722,8 @@ function createParallelCoordinates() {
   })
   .style("fill", "black")
   .style("font-family", "Nunito, sans-serif")
-  .style("font-size", "14px");
+  .style("font-size", "14px")
+  .style("font-weight", "bold");
  
   // Create the brush behavior along the y-axis.
    const brushes = []; // Create an array to store the brush instances
@@ -884,6 +891,7 @@ function createDensityPlot() {
   svg.append("g")
     .attr("class", "x-axis")
     .attr("transform", "translate(0," + height + ")")
+    .style("font-size", "12px")
     .call(d3.axisBottom(x));
 
 
@@ -895,6 +903,7 @@ function createDensityPlot() {
   svg.append("g")
     .attr("class", "y-axis")
     .attr("transform", "translate(0, 0)") // Adjust the second parameter for the desired height
+    .style("font-size", "12px")
     .call(d3.axisLeft(y));
   
 
@@ -985,10 +994,10 @@ function createDensityPlot() {
 
     // Add legend
     svg.append("circle").attr("cx", 750).attr("cy", 30).attr("r", 6).style("fill", "#69b3a2");
-    svg.append("text").attr("x", 770).attr("y", 30).text("Boston Celtics score").style("font-size", "15px").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");;
+    svg.append("text").attr("x", 770).attr("y", 30).text("Boston Celtics score").style("font-size", "14px").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");
 
     svg.append("circle").attr("cx", 750).attr("cy", 50).attr("r", 6).style("fill", "#404080");
-    svg.append("text").attr("x", 770).attr("y", 50).text("Opponent score").style("font-size", "15px").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");;
+    svg.append("text").attr("x", 770).attr("y", 50).text("Opponent score").style("font-size", "14px").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");
 
 
 
