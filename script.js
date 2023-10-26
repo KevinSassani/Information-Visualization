@@ -14,6 +14,12 @@ var currentlyClickedTeam = "non";
 var currentData_pointsSlider;
 var currentData_pointsSlider2;
 
+// Define global color variables for the parallel coordinates plot
+const hooverColor = "rgb(255,165,0)";//"rgb(0, 104, 71)";
+const clickColor = "rgb(0, 178, 243)";//"rgb(0, 104, 71)";
+const deselectedColor = "rgb(221, 221, 221)";
+const startColor = "rgb(0, 104, 71)";
+
 // Create an object to store your scales
 const yScale = {};
 const codeToName = {"ATL" : "Atlanta Hawks",

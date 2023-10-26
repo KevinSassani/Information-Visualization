@@ -1,6 +1,4 @@
 
-const clickedColor = "rgb(0, 178, 243)";
-const hooverColor = "rgb(255,165,0)";
 
 // Function to handle mouseover event in barchars viz
 function handleMouseOveBarChart(event, item) {
@@ -33,7 +31,7 @@ function handleMouseOveBarChart(event, item) {
     //.attr("stroke", "rgb(255,165,0)")
     .attr("stroke", function (d) {
       if (d.name == currentlyClickedTeam) {
-        return clickedColor;
+        return clickColor;
       } else {
         return hooverColor;
       }
@@ -68,7 +66,7 @@ function handleMouseClickBarChart(event, item) {
         // Check if "properties" exist in both item and d objects
         return item.name == d.name
       })
-      .attr("stroke", clickedColor)
+      .attr("stroke", clickColor)
       .attr("stroke-width","2px");
 
       currentlyClickedTeam = item.name;

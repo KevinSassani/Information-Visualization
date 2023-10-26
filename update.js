@@ -195,6 +195,7 @@ function updateParallelCoordinates(data) {
         if (isActive) {
           // Raise only if isActive is true
           d3.select(this).raise();
+          d3.select(this).style("opacity", 0.5);
         }
         return isActive ? startColor : deselectedColor;
       })
@@ -242,11 +243,14 @@ function updateParallelCoordinatesHooverBarChart(data) {
       if (isActive) {
         // Raise only if isActive is true
         d3.select(this).raise();
+        d3.select(this).style("opacity", 0.5);
+      } else {
+        d3.select(this).style("opacity", 0.35);
       }
       return isActive ? selectedColor : deselectedColor;
-    })
+    });
     //.style("stroke", function (d) { return (colorScale(d.season)) })
-    .style("opacity", 0.5);
+    //.style("opacity", 0.5);
 
     d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
     d3.selectAll(".brush").raise();
@@ -260,9 +264,6 @@ function updateParallelCoordinatesPermanentSelectionClick(filterResults) {
   console.log("Hoover Data: "+hooverData);
   
 
-  const deselectedColor = "rgb(221, 221, 221)";
-  const hooverColor = "rgb(255,165,0)";//"rgb(0, 104, 71)";
-  const clickColor = "rgb(0, 178, 243)";//"rgb(0, 104, 71)";
 
   // Get the container div element
   const containerDiv = document.getElementById("parallelCoordinates");
@@ -303,10 +304,10 @@ function updateParallelCoordinatesPermanentSelectionClick(filterResults) {
       } else if (hooverActive) {
         // Raise only if active
         d3.select(this).raise();
-        d3.select(this).style("opacity", 0.6);
+        d3.select(this).style("opacity", 0.5);
         return hooverColor;
       } else {
-        d3.select(this).style("opacity", 0.2);
+        d3.select(this).style("opacity", 0.35);
         return deselectedColor;
       }
     });
