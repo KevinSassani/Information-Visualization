@@ -785,7 +785,7 @@ function createDensityPlot() {
     .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
     .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
     .width(width)
-    .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
+    .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score))+1, d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
     .fill('#007A33')
     .step(1)
     .ticks(0);
@@ -833,7 +833,7 @@ function createDensityPlot() {
     .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
     .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
     .width(width)
-    .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score)), d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
+    .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score))+1, d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
     .step(1)
     .fill('#404080');
 
