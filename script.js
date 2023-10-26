@@ -82,6 +82,7 @@ function createCheckboxes(){
   allCheckbox.onchange = () => selectAll();
   const allLabel = document.createElement('label');
   allLabel.htmlFor = "selectAll";
+  allLabel.style.fontSize = "medium"
   allLabel.appendChild(allCheckbox);
   allLabel.appendChild(document.createTextNode("Select all"));
   checkboxes.appendChild(allLabel);
@@ -97,6 +98,7 @@ function createCheckboxes(){
   
     // Create a label element for the checkbox
     const label = document.createElement('label');
+    label.style.fontSize = "medium"
     label.htmlFor = key.toLowerCase();
     label.appendChild(checkbox);
     label.appendChild(document.createTextNode(key));
@@ -195,6 +197,7 @@ function createSeasonSlider() {
 
   // Get the width and height of the container using getBoundingClientRect()
   const height = containerDiv.getBoundingClientRect().height+70;
+  const width = containerDiv.getBoundingClientRect().width - margin.left//- margin.left - margin.right;
 
   // Define your seasons as numeric values
   const seasons = [2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002];
@@ -209,7 +212,7 @@ function createSeasonSlider() {
     .sliderBottom()
     .min(d3.min(seasons))
     .max(d3.max(seasons))
-    .width(900)
+    .width(width - 1/8*width)
     .tickFormat(formatSeason) // Use the function to format ticks
     .ticks(20)
     .step(1)
@@ -219,11 +222,11 @@ function createSeasonSlider() {
   // Append the slider to the HTML element with id="seasonSlider"
   d3.select('#seasonSlider')
     .append('svg')
-    .attr('width', 1000) // Adjust the width as needed
+    .attr('width', width) // Adjust the width as needed
     .attr('height', height) // Adjust the height as needed
     .attr("class", "seasonSliderStylingClass")
     .append('g')
-    .attr('transform', 'translate(30,30)') // Adjust the position as needed
+    .attr('transform', `translate(${margin.left},${margin.top})`) // Adjust the position as needed
     .call(sliderRange);
     
 
@@ -886,7 +889,7 @@ function createDensityPlot() {
 
   var y = d3.scaleLinear()
     .range([height, 0])
-    .domain([0, 0.07])
+    .domain([0, 0.1])
     .nice();
   
   svg.append("g")
