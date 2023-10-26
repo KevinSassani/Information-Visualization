@@ -58,7 +58,6 @@ function handleMouseClickBarChart(event, item) {
     currentData_barChartClick = originalData;
     updateParallelCoordinates(aggregateFilteredData());
     currentlyClickedTeam = "non"
-    console.log(currentlyClickedTeam);
 
   } else {
 
@@ -73,7 +72,6 @@ function handleMouseClickBarChart(event, item) {
       .attr("stroke-width","2px");
 
       currentlyClickedTeam = item.name;
-      console.log(currentlyClickedTeam);
       currentData_barChartClick = originalData.filter((d) => {return item.name == d.opp}); // Maybe should not include this data in the aggreagate function, do concate here instead?
       updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
 
@@ -102,11 +100,6 @@ function handleMouseOutBarChart(event, item){
         d3.select(this).attr("stroke", "none");
       }
     });
-    /*.attr("stroke", function (d) {
-        if (!(d.name == currentlyClickedTeam)) {
-          return "none";
-        }
-    });*/
 
     currentData_barChartHoover = originalData;
     updateParallelCoordinatesPermanentSelectionClick(aggregateFilteredDataPermanentSelection(false));
@@ -141,9 +134,6 @@ function hideTooltip() {
 const selections = new Map();
  
 function brushed({ selection }, key, data) {
-  const deselectedColor = "rgb(221, 221, 221)";
-  const startColor = "rgb(0, 104, 71)";
-  const brushWidth = 50;
 
 
   if (selection === null) selections.delete(key);
@@ -202,10 +192,11 @@ function aggregateFilteredData() {
     const set_barCharts = new Set(currentData_barCharts.map(d => d.id));
     const set_barChartsHoover = new Set(currentData_barChartHoover.map(d => d.id));
     const set_season = new Set(currentData_seasonSlider.map(d => d.id));
-    // ADD FOR DENSITY PLOT AS WELL
+    const set_pointSliderCeltics = new Set(currentData_pointsSlider.map(d => d.id));
+    const set_pointSliderOpponent = new Set(currentData_pointsSlider2.map(d => d.id));
   
     // Find the common data points by intersecting the sets
-    const commonDataPoints = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsHoover.has(id));
+    const commonDataPoints = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsHoover.has(id) && set_pointSliderCeltics.has(id) && set_pointSliderOpponent.has(id));
   
     const aggregatedDataset = originalData.filter(d => commonDataPoints.includes(d.id));
   
@@ -219,14 +210,15 @@ function aggregateFilteredDataPermanentSelection(hooverActive) {
     const set_parallel = new Set(currentData_parallelCoordinates.map(d => d.id));
     const set_barCharts = new Set(currentData_barCharts.map(d => d.id));
     const set_season = new Set(currentData_seasonSlider.map(d => d.id));
-    // ADD FOR DENSITY PLOT AS WELL
+    const set_pointSliderCeltics = new Set(currentData_pointsSlider.map(d => d.id));
+    const set_pointSliderOpponent = new Set(currentData_pointsSlider2.map(d => d.id));
 
     const set_barChartsHoover = new Set(currentData_barChartHoover.map(d => d.id));
     const set_barChartsClick = new Set(currentData_barChartClick.map(d => d.id));
 
     // Apply filtering to the clicked and hoovered data to keep already applied filters from other idoms/filters
-    const commonDataPointsHoover = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsHoover.has(id));
-    const commonDataPointsClick = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsClick.has(id));
+    const commonDataPointsHoover = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_pointSliderCeltics.has(id) && set_pointSliderOpponent.has(id) && set_barChartsHoover.has(id));
+    const commonDataPointsClick = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_pointSliderCeltics.has(id) && set_pointSliderOpponent.has(id) && set_barChartsClick.has(id));
   
     const hooverDataset = originalData.filter(d => commonDataPointsHoover.includes(d.id));
     const clickDataset = originalData.filter(d => commonDataPointsClick.includes(d.id));
@@ -237,13 +229,15 @@ function aggregateFilteredDataPermanentSelection(hooverActive) {
     const set_parallel = new Set(currentData_parallelCoordinates.map(d => d.id));
     const set_barCharts = new Set(currentData_barCharts.map(d => d.id));
     const set_season = new Set(currentData_seasonSlider.map(d => d.id));
+    const set_pointSliderCeltics = new Set(currentData_pointsSlider.map(d => d.id));
+    const set_pointSliderOpponent = new Set(currentData_pointsSlider2.map(d => d.id));
     // ADD FOR DENSITY PLOT AS WELL
 
     
     const set_barChartsClick = new Set(currentData_barChartClick.map(d => d.id));
 
     // Apply filtering to the clicked and hoovered data to keep already applied filters from other idoms/filters
-    const commonDataPointsClick = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_barChartsClick.has(id));
+    const commonDataPointsClick = [...set_parallel].filter(id => set_barCharts.has(id) && set_season.has(id) && set_pointSliderCeltics.has(id) && set_pointSliderOpponent.has(id) && set_barChartsClick.has(id));
   
     const clickDataset = originalData.filter(d => commonDataPointsClick.includes(d.id));
   

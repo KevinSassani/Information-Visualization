@@ -88,7 +88,9 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     svgW
       .selectAll(".bar")
       .on("mouseover", handleMouseOveBarChart)
+      .on("mousemove", handleMouseOveBarChart)
       .on("mouseout", handleMouseOutBarChart)
+      .on("click", handleMouseClickBarChart)
       
 
 
@@ -136,10 +138,6 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     .attr("width", 0)
     .attr("height", yScaleL.bandwidth())
     .attr("fill", d => d3.interpolateReds(fillScale(d.lossesRatio)))
-    .on("mouseover", handleMouseOveBarChart)
-    .on("mousemove", handleMouseOveBarChart)
-    .on("mouseout", handleMouseOutBarChart)
-    .on("click", handleMouseClickBarChart)
     .transition()
     .duration(1000)
     .attr("width",d => xScaleL(d.losses));
@@ -154,7 +152,9 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     svgL
       .selectAll(".bar")
       .on("mouseover", handleMouseOveBarChart)
+      .on("mousemove", handleMouseOveBarChart)
       .on("mouseout", handleMouseOutBarChart)
+      .on("click", handleMouseClickBarChart)
   }
 
 function updateParallelCoordinates(data) {
@@ -203,103 +203,6 @@ function updateParallelCoordinates(data) {
 
       d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
       d3.selectAll(".brush").raise();
-
-      /*
-      const dimensionMapping = {
-        "fg_percentage": "Field-goal %",
-        "free_throw_percentage": "Free-throw %",
-        "ast": "Assist",
-        "orb": "Offensive rebound",
-        "drb": "Defensive rebound",
-        "stl": "Steal",
-        "blk": "Block"
-      };
-  
-    // Draw the axis:
-    function mapDimensionToAxisLabelValue(dimension) {
-      return dimensionMapping[dimension] || dimension;
-    }
-    
-    // Draw the axis:
-    d3.select("#parallelCoordinates").selectAll("myAxis")
-    // For each dimension of the dataset I add a 'g' element:
-    .data(dimensions).enter()
-    .append("g")
-    .attr("class", "axisParallel")
-    // I translate this element to its right position on the x axis
-    .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
-    .on("mouseover", showTooltipParallel)
-    .on("mousemove", showTooltipParallel)
-    .on("mouseleave", hideTooltip)
-    // And I build the axis with the call function
-    .each(function(d) {
-      // Calculate the min and max values for the current dimension
-      var minVal = d3.min(originalData, p => +p[d]);
-      var maxVal = d3.max(originalData, p => +p[d]);
-  
-      // Create a scale for the current axis
-      var axisScale = d3.scaleLinear()
-        .domain([minVal, maxVal])
-        .range([height, 0]);
-  
-      // Create the axis with only the min and max ticks
-      var axis = d3.axisLeft().scale(yScale[d]).tickValues([minVal, maxVal]);
-  
-      d3.select(this).call(axis);
-  
-      // Add axis title
-      d3.select(this)
-        .append("text")
-        .style("text-anchor", "middle")
-        .attr("y", -9)
-        .text((d) => mapDimensionToAxisLabelValue(d))
-        .style("fill", "black")
-        .style("font-family", "Nunito, sans-serif")
-        .style("font-size", "12px");
-
-      d3.select("#parallelCoordinates").selectAll(".axisParallel").raise();
-      d3.selectAll(".brush").raise();
-      
-    });
-        
-
-    // Create the brush behavior along the y-axis.
-   const brushes = []; // Create an array to store the brush instances
-/*
-   // Create the brushes for each axis
-   dimensions.forEach((key) => {
-     const brush = d3.brushY()
-       .extent([
-         [-(brushWidth / 2), 0],
-         [brushWidth / 2, height]
-       ])
-       .on("start brush end", function (event) {
-         brushed(event, key, data);
-       });
-   
-     brushes.push(brush); // Store the brush in the array
-   });
-   
-   // Attach the brushes to the axes
-   const axes = d3.select("#parallelCoordinates").selectAll(".axisParallel");
-   axes.each(function (d, i) {
-     d3.select(this).call(brushes[i]); // Use the appropriate brush from the array
-   });
-   */
-/*
-    // Create the brush behavior along the y-axis.
-    const brush = d3.brushY()
-      .extent([
-        [-(brushWidth / 2), 0],
-        [brushWidth / 2, height]
-      ])
-      .on("start brush end", (event) => brushed(event, key, data));
-      //.on("start brush end", brushed);
-
-    // Attach the brush to the axes
-    const axes = d3.select("#parallelCoordinates").selectAll(".axis");
-    axes.call(brush);
-    */
 }
 
 function updateParallelCoordinatesHooverBarChart(data) {
