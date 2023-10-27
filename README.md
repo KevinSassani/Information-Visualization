@@ -1,4 +1,5 @@
 # Information Visualization Project
+To start:
 1. Open your terminal.
 2. Type cd followed by the directory path.
 2. Once you're in the directory, run the following command: 
