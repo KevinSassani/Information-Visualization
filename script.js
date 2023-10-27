@@ -786,12 +786,14 @@ function createDensityPlot() {
     .append("g")
     .style("transform", `translate(${margin.left}%,${margin.top}%)`)
   
+  const heightSlidder = document.getElementById("densityPlotSliderContainer").getBoundingClientRect().height
   var sliderContainer = d3.select("#slider-tm").classed("slider-container", true);
     
   var sliderSvg = sliderContainer.append("svg")
     //.attr("id", "slider")
     .attr("width", "100%")
-    .attr("height", "100%")
+    .attr("height", heightSlidder/2)
+    .style("transform", "translate(5%,25%)")
   
   const sliderRange = d3
     .sliderBottom()
@@ -834,7 +836,8 @@ function createDensityPlot() {
   var sliderSvg2 = sliderContainer.append("svg")
     //.attr("id", "slider")
     .attr("width", "100%")
-    .attr("height", "100%");
+    .attr("height", heightSlidder/2)
+    .style("transform", "translate(5%,5%)");
   min = d3.min(originalData, d => Math.min(d.tm, d.opp_score));
 
   const sliderRange2 = d3
