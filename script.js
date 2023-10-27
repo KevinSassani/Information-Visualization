@@ -65,10 +65,10 @@ var selectAllTeams = true;
 
 // Define margin and dimensions for the charts
 const margin = {
-  top: 30,
-  right: 50,
-  bottom: 30,
-  left: 50
+  top: 10,
+  right: 5,
+  bottom: 10,
+  left: 5
 };
 
 // show team checkbox
@@ -226,7 +226,7 @@ function createSeasonSlider() {
     .attr('height', height) // Adjust the height as needed
     .attr("class", "seasonSliderStylingClass")
     .append('g')
-    .attr('transform', `translate(${margin.left},${margin.top})`) // Adjust the position as needed
+    .style("transform", `translate(${margin.left}%,25%)`)
     .call(sliderRange);
     
 
@@ -238,7 +238,6 @@ function createSeasonSlider() {
 
     const lowSeason = formatSeason(value[0]);
     const highSeason = formatSeason(value[1]);
-    console.log("Selected seasons: "+lowSeason+" til' "+highSeason);
 
 
     // Filter based on the seasonSlider
@@ -272,10 +271,9 @@ function createBarCharts(){
   const containerDiv = document.getElementById("barCharts");
 
   // Get the width and height of the container using getBoundingClientRect()
-  const width = containerDiv.getBoundingClientRect().width - margin.left//- margin.left - margin.right;
-  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+  const width = containerDiv.getBoundingClientRect().width//- margin.left - margin.right;
+  const height = containerDiv.getBoundingClientRect().height;
 
-  const padding = 30
 
   // first make a count for each opponent team of wins and loses.
   wlTable = winsandlosses(originalData)
@@ -289,18 +287,17 @@ function createBarCharts(){
     .attr("width", (width)/2)
     .attr("height", height)
     .append("g")
+    .style("transform", `translate(20%,3%)`)
     .attr("id", "winsBarChart")
-    .style("z-index",1)
-    .style("position","absolute")
-    .attr("transform", `translate(${50 + margin.left},${margin.top})`);
+
   // Define scales
   const yScaleW = d3.scaleBand()
     .domain(wTable.map(d => d.name))
-    .range([height - margin.top - margin.bottom, 0])
+    .range([0.9*height, 0])
     .padding(0.3);
   const xScaleW = d3.scaleLinear()
     .domain([0, d3.max(wTable, d => d.wins)])
-    .range([0, width / 2 - margin.left - margin.right - 10])
+    .range([0,0.75*(width / 2)])
     .nice();
   const fillScale = d3.scaleLinear()
     .domain([0,1])
@@ -325,34 +322,35 @@ function createBarCharts(){
   // Add x-axis
   svgW.append("g")
     .attr("class", "x-axis")
-    .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
+    .style("transform", `translate(0, ${0.9*height}px)`)
     .call(d3.axisBottom(xScaleW))
     .style("font-family", "Nunito, sans-serif")
-    .style("font-size", "12px");
+    .style("font-size", "0.7vw");
   // Add y-axis
   svgW.append("g")
     .attr("class", "y-axis")
     .call(d3.axisLeft(yScaleW))
     .style("font-family", "Nunito, sans-serif")
-    .style("font-size", "12px");
+    .style("font-size", "0.7vw");
   // Add X-axis legend
   svgW.append("text")
     .attr("class", "x-axis-legend")
-    .attr("x", margin.left)
-    .attr("y", height - margin.bottom + 20)
+    .attr("x", width/8)
+    .attr("y", 0.95*height)
     .text("Games won")
     .style("font-family", "Nunito, sans-serif")
-    .style("font-size", "14px");
+    .style("font-size", "0.8vw")
+    .style("font-weight", "bold");
     
   // Add Y-axis legend
   svgW.append("text")
     .attr("class", "y-axis-legend")
     .attr("transform", "rotate(-90)")
     .attr("x", -height / 2)
-    .attr("y", -margin.left)
+    .attr("y", -width/15)
     .text("Teams")
     .style("font-family", "Nunito, sans-serif")
-    .style("font-size", "14px")
+    .style("font-size", "0.8vw")
     .style("font-weight", "bold");
 
   // losses svg
@@ -362,17 +360,18 @@ function createBarCharts(){
     .attr("width", (width) / 2)
     .attr("height", height)
     .append("g")
+    .style("transform", `translate(20%,3%)`)
     .attr("id", "lossesBarChart")
     .attr("transform", `translate(${margin.left + 50},${margin.top})`);
   // Define scales
   const yScaleL = d3.scaleBand()
     .domain(lTable.map(d => d.name))
-    .range([height - margin.top - margin.bottom, 0])
+    .range([0.9*height, 0])
     .padding(0.3);
   const xScaleL = d3.scaleLinear()
     .domain([0, d3.max(lTable, d => d.losses)])
     .nice()
-    .range([0, width / 2 - margin.left - margin.right - 10])
+    .range([0, 0.75*(width / 2)])
   // Create and append the bars
   svgL.selectAll(".bar")
     .data(lTable)
@@ -392,32 +391,33 @@ function createBarCharts(){
   // Add x-axis
   svgL.append("g")
     .attr("class", "x-axis")
-    .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
+    .style("transform", `translate(0, ${0.9*height}px)`)
     .call(d3.axisBottom(xScaleL))
     .style("font-family", "Nunito, sans-serif") // Set the font-family
-    .style("font-size", "12px");
+    .style("font-size", "0.7vw");
   // Add y-axis
   svgL.append("g")
     .attr("class", "y-axis")
     .call(d3.axisLeft(yScaleL))
     .style("font-family", "Nunito, sans-serif") // Set the font-family
-    .style("font-size", "12px");
+    .style("font-size", "0.7vw");
   svgL.append("text")
     .attr("class", "x-axis-legend")
-    .attr("x", margin.left)
-    .attr("y", height - margin.bottom + 20)
+    .attr("x", width/8)
+    .attr("y", 0.95*height)
     .text("Games lost")
     .style("font-family", "Nunito, sans-serif")
-    .style("font-size", "14px"); // Set the font-family
+    .style("font-size", "0.8vw") // Set the font-family
+    .style("font-weight", "bold");
   // Add Y-axis legend
   svgL.append("text")
     .attr("class", "y-axis-legend")
     .attr("transform", "rotate(-90)")
     .attr("x", -height / 2)
-    .attr("y", -margin.left)
+    .attr("y", -width/15)
     .text("Teams")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
-    .style("font-size", "14px")
+    .style("font-size", "0.8vw")
     .style("font-weight", "bold");
 }
 
@@ -427,7 +427,7 @@ function createBarChartsLegend(){
 
   // Get the width and height of the container using getBoundingClientRect()
   const width = containerDiv.getBoundingClientRect().width //- margin.left
-  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+  const height = containerDiv.getBoundingClientRect().height;
 
   var legendColors = []; // Values from the color scale
   for(var i = 0; i <= 1; i=i+0.01){
@@ -442,24 +442,24 @@ function createBarChartsLegend(){
     .attr("height", height)
     .append("g")
     .attr("id", "winsLegendGroup")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .style("transform", `translate(${width/16}%,${margin.top}%)`)
   lW
     .selectAll("rect")
     .data(legendColors)
     .enter()
     .append("rect")
     .attr("x", (d,i) => i * 2)
-    .attr("y", 10)
+    .attr("y", 0)
     .attr("width", 2)
     .attr("height", "2vw")
     .attr("fill", d => d3.interpolateGreens(d));
   lW.append("text")
-    .attr("x", margin.left + 50)
-    .attr("y", 0)
+    .attr("x", width/3)
+    .attr("y", height/2)
     .attr("text-anchor", "middle")
-    .text("Wins Ratio")
+    .text("Win Ratio")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
-    .style("font-size", "14px")
+    .style("font-size", "0.8vw")
     .style("font-weight", "bold")
     .style("padding", "10") 
     
@@ -471,24 +471,24 @@ function createBarChartsLegend(){
     .attr("height", height)
     .append("g")
     .attr("id", "lossesLegendGroup")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .style("transform", `translate(${width/16}%,${margin.top}%)`)
   lL
     .selectAll("rect")
     .data(legendColors)
     .enter()
     .append("rect")
     .attr("x", (d,i) => i * 2)
-    .attr("y", 10)
+    .attr("y", 0)
     .attr("width", 2)
-    .attr("height", "30px")
+    .attr("height", "2vw")
     .attr("fill", d => d3.interpolateReds(d));
   lL.append("text")
-    .attr("x", margin.left + 50)
-    .attr("y", 0)
+    .attr("x", width/3)
+    .attr("y", height/2)
     .attr("text-anchor", "middle")
     .text("Loss Ratio")
     .style("font-family", "Nunito, sans-serif") // Set the font-family
-    .style("font-size", "14px")
+    .style("font-size", "0.8vw")
     .style("font-weight", "bold")
     .style("padding", "10") 
 }
@@ -611,16 +611,16 @@ function createParallelCoordinates() {
   const containerDiv = document.getElementById("parallelCoordinates");
 
   // Get the width and height of the container using getBoundingClientRect()
-  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
-  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+  const width = containerDiv.getBoundingClientRect().width;
+  const height = containerDiv.getBoundingClientRect().height;
 
   const svg = d3
     .select("#parallelCoordinates")
     .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.bottom + margin.top)
+      .attr("width", width)
+      .attr("height", height)
     .append("g")
-      .attr("transform",`translate(${margin.left},${margin.top})`);
+      .style("transform", `translate(${margin.left}%,${margin.top}%)`)
 
   // Choose dimensions to include in the plot
   dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
@@ -636,14 +636,14 @@ function createParallelCoordinates() {
     // Create a linear scale for the dimension
     const scale = d3.scaleLinear()
       .domain([min, max])
-      .range([height, 0]); 
+      .range([0.85*height, 0]); 
 
     // Store the scale in the yScale
     yScale[dimension] = scale;
   });
 
   xScale = d3.scalePoint()
-    .range([0, width])
+    .range([0, 0.9*width])
     .domain(dimensions);
 
   // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
@@ -686,7 +686,7 @@ function createParallelCoordinates() {
   .on("mouseover", showTooltipParallel)
   .on("mousemove", showTooltipParallel)
   .on("mouseleave", hideTooltip)
-  .style("font-size", "12px")
+  .style("font-size", "0.7vw")
   // And I build the axis with the call function
   .each(function(d) {
     // Calculate the min and max values for the current dimension
@@ -722,7 +722,7 @@ function createParallelCoordinates() {
   })
   .style("fill", "black")
   .style("font-family", "Nunito, sans-serif")
-  .style("font-size", "14px")
+  .style("font-size", "0.8vw")
   .style("font-weight", "bold");
  
   // Create the brush behavior along the y-axis.
@@ -775,41 +775,33 @@ function createDensityPlot() {
   const containerDiv = document.getElementById("densityPlotFigure");
 
   // Get the width and height of the container using getBoundingClientRect()
-  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
-  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom - 40;
-
-  
-
+  const width = containerDiv.getBoundingClientRect().width;
+  const height = containerDiv.getBoundingClientRect().height;
 
   var svg = d3.select("#densityPlotFigure")
     .append("svg")
-    .attr("width", width + margin.left + margin.right)
+    .attr("width", width)
     .attr("height", "100%") // Set the height to 100% of the parent container
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
+    .style("transform", `translate(${margin.left}%,${margin.top}%)`)
   
   var sliderContainer = d3.select("#slider-tm").classed("slider-container", true);
     
-
   var sliderSvg = sliderContainer.append("svg")
     //.attr("id", "slider")
     .attr("width", "100%")
     .attr("height", "100%")
   
-
   const sliderRange = d3
     .sliderBottom()
     .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
     .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
-    .width(width)
+    .width(0.9*width)
     .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score))+1, d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
     .fill('#007A33')
     .step(1)
     .ticks(0);
   
-
   sliderRange.on('onchange', val => {
     //x.domain(val);
     minSliderValue = val[0];
@@ -836,10 +828,7 @@ function createDensityPlot() {
 
   sliderSvg.call(sliderRange);
 
-
-
   var sliderContainer = d3.select("#slider-opp_score").classed("slider-container", true);
-  
 
   var sliderSvg2 = sliderContainer.append("svg")
     //.attr("id", "slider")
@@ -851,7 +840,7 @@ function createDensityPlot() {
     .sliderBottom()
     .min(d3.min(originalData, d => Math.min(d.tm, d.opp_score)))
     .max(d3.max(originalData, d => Math.max(d.tm, d.opp_score)))
-    .width(width)
+    .width(0.9*width)
     .default([d3.min(originalData, d => Math.min(d.tm, d.opp_score))+1, d3.max(originalData, d => Math.max(d.tm, d.opp_score))])
     .step(1)
     .fill('#404080');
@@ -886,32 +875,24 @@ function createDensityPlot() {
       d3.max(originalData, function (d) { return Math.max(d.tm, d.opp_score); })
     ])
     .nice()
-    .range([0, width]);
+    .range([0, 0.9*width]);
 
   svg.append("g")
     .attr("class", "x-axis")
-    .attr("transform", "translate(0," + height + ")")
-    .style("font-size", "12px")
+    .attr("transform", "translate(0," + 0.8*height + ")")
+    .style("font-size", "0.7vw")
     .call(d3.axisBottom(x));
 
-
   var y = d3.scaleLinear()
-    .range([height, 0])
+    .range([0.8*height, 0])
     .domain([0, 0.1])
     .nice();
   
   svg.append("g")
     .attr("class", "y-axis")
     .attr("transform", "translate(0, 0)") // Adjust the second parameter for the desired height
-    .style("font-size", "12px")
+    .style("font-size", "0.7vw")
     .call(d3.axisLeft(y));
-  
-
-  // Get the height of the #densityPlotFigure
-
-
-
-  
   
 
   function kernelDensityEstimator(kernel, X) {
@@ -993,14 +974,11 @@ function createDensityPlot() {
       );
 
     // Add legend
-    svg.append("circle").attr("cx", 750).attr("cy", 30).attr("r", 6).style("fill", "#69b3a2");
-    svg.append("text").attr("x", 770).attr("y", 30).text("Boston Celtics score").style("font-size", "14px").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");
+    svg.append("circle").attr("cx", width/2).attr("cy", height/11).attr("r", 6).style("fill", "#69b3a2");
+    svg.append("text").attr("x", width/2+12).attr("y", height/10).text("Boston Celtics score").style("font-size", "0.8vw").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");
 
-    svg.append("circle").attr("cx", 750).attr("cy", 50).attr("r", 6).style("fill", "#404080");
-    svg.append("text").attr("x", 770).attr("y", 50).text("Opponent score").style("font-size", "14px").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");
-
-
-
+    svg.append("circle").attr("cx", width/2).attr("cy", height/7).attr("r", 6).style("fill", "#404080");
+    svg.append("text").attr("x", width/2 + 12).attr("y", height/6).text("Opponent score").style("font-size", "0.8vw").attr("alignment-baseline", "middle").style("font-family", "Nunito, sans-serif");
 
   }
 

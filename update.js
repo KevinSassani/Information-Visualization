@@ -3,8 +3,8 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     const containerDiv = document.getElementById("barCharts");
 
     // Get the width and height of the container using getBoundingClientRect()
-    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
-    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+    const width = containerDiv.getBoundingClientRect().width;
+    const height = containerDiv.getBoundingClientRect().height;
 
     const padding = 30  
   
@@ -22,13 +22,13 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     // Create or update scales for the chart
     const yScaleW = d3.scaleBand()
       .domain(wTable.map(d => d.name))
-      .range([height - margin.top - margin.bottom, 0])
+      .range([0.9*height, 0])
       .padding(0.3);
 
     const xScaleW = d3.scaleLinear()
       .domain([0, maxWins])
       .nice()
-      .range([0, width / 2 - margin.left - margin.right - 10]);
+      .range([0, 0.75*(width / 2)]);
 
     const fillScale = d3.scaleLinear()
       .domain([0,1])
@@ -100,13 +100,13 @@ function updateBarChart(data) { // HAVE TO UPDATE THE AXES AS WELL
     // Create or update scales for the chart
     const yScaleL = d3.scaleBand()
       .domain(lTable.map(d => d.name))
-      .range([height - margin.top - margin.bottom, 0])
+      .range([0.9*height, 0])
       .padding(0.3);
 
     const xScaleL = d3.scaleLinear()
       .domain([0, maxLosses])
       .nice()
-      .range([0, width / 2 - margin.left - margin.right - 10]);
+      .range([0, 0.75*(width / 2)]);
 
     // Update the x-axis
     svgL.select(".x-axis")
@@ -166,15 +166,15 @@ function updateParallelCoordinates(data) {
     const containerDiv = document.getElementById("parallelCoordinates");
 
     // Get the width and height of the container using getBoundingClientRect()
-    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
-    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+    const width = containerDiv.getBoundingClientRect().width;
+    const height = containerDiv.getBoundingClientRect().height;
 
 
     // Choose dimensions to include in the plot
     dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
 
     xScale = d3.scalePoint()
-    .range([0, width])
+    .range([0, 0.9*width])
     .domain(dimensions);
 
 
@@ -214,15 +214,15 @@ function updateParallelCoordinatesHooverBarChart(data) {
   const containerDiv = document.getElementById("parallelCoordinates");
 
   // Get the width and height of the container using getBoundingClientRect()
-  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
-  const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom;
+  const width = containerDiv.getBoundingClientRect().width;
+  const height = containerDiv.getBoundingClientRect().height;
 
 
   // Choose dimensions to include in the plot
   dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
 
   xScale = d3.scalePoint()
-  .range([0, width])
+  .range([0, 0.9*width])
   .domain(dimensions);
 
 
@@ -260,8 +260,6 @@ function updateParallelCoordinatesHooverBarChart(data) {
 function updateParallelCoordinatesPermanentSelectionClick(filterResults) {
   clickData = filterResults[0];
   hooverData = filterResults[1];
-  console.log("Click Data: "+clickData);
-  console.log("Hoover Data: "+hooverData);
   
 
 
@@ -269,14 +267,14 @@ function updateParallelCoordinatesPermanentSelectionClick(filterResults) {
   const containerDiv = document.getElementById("parallelCoordinates");
 
   // Get the width and height of the container using getBoundingClientRect()
-  const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
+  const width = containerDiv.getBoundingClientRect().width;
 
 
   // Choose dimensions to include in the plot
   dimensions = ["fg_percentage", "free_throw_percentage", "ast", "orb", "drb", "stl", "blk"];
 
   xScale = d3.scalePoint()
-  .range([0, width])
+  .range([0, 0.9*width])
   .domain(dimensions);
 
 
@@ -370,21 +368,20 @@ function updateDensityPlot(currentData){
     
 function updateCurve(fieldValue, data, min, max){
     const containerDiv = document.getElementById("densityPlotFigure");
-    const width = containerDiv.getBoundingClientRect().width - margin.left - margin.right;
-    const height = containerDiv.getBoundingClientRect().height - margin.top - margin.bottom - 40;
+    const width = containerDiv.getBoundingClientRect().width;
+    const height = containerDiv.getBoundingClientRect().height;
     const fieldToFilter = dataField = fieldValue;
     
     // Filter the data based on the selected field
     const filteredData = data.filter(d => d[fieldToFilter] >= min && d[fieldToFilter] <= max); 
     
-    //console.log(filteredData)
     
     
     // Calculate the max and min values for the filtered "tm" data
     var xFiltered = d3.scaleLinear()
     .domain([56, 150]) // Fixed x-axis domain
     .nice()
-    .range([0, width]);
+    .range([0, 0.9*width]);
     
     
     
@@ -398,7 +395,7 @@ function updateCurve(fieldValue, data, min, max){
     
     
     var y = d3.scaleLinear()
-    .range([height, 0])
+    .range([0.8*height, 0])
     .domain([0, 0.07])
     .nice();
     
