@@ -15,7 +15,7 @@ var currentData_pointsSlider;
 var currentData_pointsSlider2;
 
 // Define global color variables for the parallel coordinates plot
-const hooverColor = "rgb(255,165,0)";//"rgb(0, 104, 71)";
+const hooverColor = "black";//"rgb(255,165,0)";//"rgb(0, 104, 71)";
 const clickColor = "rgb(0, 178, 243)";//"rgb(0, 104, 71)";
 const deselectedColor = "rgb(221, 221, 221)";
 const startColor = "rgb(0, 104, 71)";
@@ -381,6 +381,7 @@ function createBarCharts(){
     .on("mouseover", handleMouseOveBarChart)
     .on("mousemove", handleMouseOveBarChart)
     .on("mouseout", handleMouseOutBarChart)
+    .on("click", handleMouseClickBarChart)
     .attr("class", "bar")
     .attr("x", xScaleW(0))
     .attr("y", d => yScaleL(d.name))
